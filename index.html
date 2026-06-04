@@ -409,13 +409,16 @@
         <div class="row">
           <div>
             <label for="replyEmail">返信先メールアドレス</label>
-            <input id="replyEmail" type="text" placeholder="空欄なら info@refinas.jp" />
+            <input id="replyEmail" type="text" placeholder="空欄なら refinasfitnessstudio@gmail.com" />
           </div>
           <div>
             <label for="sendSubject">件名上書き</label>
             <input id="sendSubject" type="text" placeholder="空欄ならテンプレートの既定件名" />
           </div>
         </div>
+
+        <label for="bccEmail">BCCメールアドレス</label>
+        <input id="bccEmail" type="text" placeholder="例：refinas.ads@gmail.com。複数の場合は半角カンマ区切り。空欄ならBCCなし" />
 
         <label for="campaignText">キャンペーン文言</label>
         <input id="campaignText" type="text" placeholder="テンプレート変数 campaign_text に渡す場合のみ入力" />
@@ -874,10 +877,12 @@
 
         const replyEmail = document.getElementById('replyEmail').value.trim();
         const subject = document.getElementById('sendSubject').value.trim();
+        const bccEmail = document.getElementById('bccEmail').value.trim();
         const campaignText = document.getElementById('campaignText').value.trim();
 
         if (replyEmail) payload.reply_email = replyEmail;
         if (subject) payload.subject = subject;
+        if (bccEmail) payload.bcc_email = bccEmail;
         if (campaignText) payload.campaign_text = campaignText;
 
         status.className = 'status';
