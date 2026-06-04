@@ -1137,5 +1137,413 @@
         .replaceAll("'", '&#039;');
     }
   </script>
+  <!-- =========================================================
+  追加のみ：送信履歴分析タブ
+  既存HTMLは変更せず、このブロックを </body> の直前に追加してください。
+========================================================= -->
+<script>
+(function () {
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function getValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function getSecretForAnalysis() {
+    const secret = getValue('sendSecret');
+    if (!secret) throw new Error('送信用秘密キーを入力してください。');
+    return secret;
+  }
+
+  function getLogsUrlForAnalysis() {
+    const url = getValue('logsUrl');
+    if (!url) throw new Error('送信履歴 Function URLを入力してください。');
+    return url;
+  }
+
+  async function callLogsFunctionForAnalysis(payload) {
+    const response = await fetch(getLogsUrlForAnalysis(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-send-secret': getSecretForAnalysis()
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data, null, 2));
+    }
+
+    return data;
+  }
+
+  function getDateOnly(value) {
+    if (!value) return '';
+    return String(value).slice(0, 10);
+  }
+
+  function countBy(logs, keyGetter) {
+    const map = new Map();
+
+    for (const log of logs) {
+      const key = keyGetter(log) || '未設定';
+      map.set(key, (map.get(key) || 0) + 1);
+    }
+
+    return Array.from(map.entries())
+      .map(([key, count]) => ({ key, count }))
+      .sort((a, b) => b.count - a.count || String(a.key).localeCompare(String(b.key), 'ja'));
+  }
+
+  function countByTemplateAndStatus(logs) {
+    const map = new Map();
+
+    for (const log of logs) {
+      const template = log.template_key || '未設定';
+      const status = log.status || '未設定';
+      const key = template + '||' + status;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          template_key: template,
+          template_name: log.template_name || '',
+          status,
+          count: 0
+        });
+      }
+
+      map.get(key).count += 1;
+    }
+
+    return Array.from(map.values())
+      .sort((a, b) => String(a.template_key).localeCompare(String(b.template_key), 'ja') || String(a.status).localeCompare(String(b.status), 'ja'));
+  }
+
+  function buildSummary(logs) {
+    const total = logs.length;
+    const sent = logs.filter(log => log.status === 'sent').length;
+    const failed = logs.filter(log => log.status === 'failed').length;
+    const skipped = logs.filter(log => log.status === 'skipped').length;
+    const uniqueEmails = new Set(logs.map(log => log.email).filter(Boolean)).size;
+    const latestSentAt = logs.length ? logs.map(log => log.sent_at).filter(Boolean).sort().reverse()[0] : '';
+
+    return {
+      total,
+      sent,
+      failed,
+      skipped,
+      uniqueEmails,
+      successRate: total ? Math.round((sent / total) * 1000) / 10 : 0,
+      latestSentAt
+    };
+  }
+
+  function renderSummaryCards(summary) {
+    return `
+      <div class="row-3">
+        <div class="card" style="margin-bottom: 10px;">
+          <strong>総履歴数</strong><br>
+          <span style="font-size: 24px;">${escapeHtml(summary.total)}</span>
+        </div>
+        <div class="card" style="margin-bottom: 10px;">
+          <strong>送信成功</strong><br>
+          <span style="font-size: 24px;">${escapeHtml(summary.sent)}</span>
+        </div>
+        <div class="card" style="margin-bottom: 10px;">
+          <strong>成功率</strong><br>
+          <span style="font-size: 24px;">${escapeHtml(summary.successRate)}%</span>
+        </div>
+      </div>
+      <div class="row-3">
+        <div class="card" style="margin-bottom: 10px;">
+          <strong>失敗</strong><br>
+          <span style="font-size: 24px;">${escapeHtml(summary.failed)}</span>
+        </div>
+        <div class="card" style="margin-bottom: 10px;">
+          <strong>スキップ</strong><br>
+          <span style="font-size: 24px;">${escapeHtml(summary.skipped)}</span>
+        </div>
+        <div class="card" style="margin-bottom: 10px;">
+          <strong>送信先ユニーク数</strong><br>
+          <span style="font-size: 24px;">${escapeHtml(summary.uniqueEmails)}</span>
+        </div>
+      </div>
+      <p class="note">最新送信日時：${escapeHtml(summary.latestSentAt || 'なし')}</p>
+    `;
+  }
+
+  function renderSimpleCountTable(title, rows, keyLabel) {
+    if (!rows.length) {
+      return `<h3>${escapeHtml(title)}</h3><p>データがありません。</p>`;
+    }
+
+    let html = `
+      <h3>${escapeHtml(title)}</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>${escapeHtml(keyLabel)}</th>
+            <th>件数</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    for (const row of rows) {
+      html += `
+        <tr>
+          <td>${escapeHtml(row.key)}</td>
+          <td>${escapeHtml(row.count)}</td>
+        </tr>
+      `;
+    }
+
+    html += '</tbody></table>';
+    return html;
+  }
+
+  function renderTemplateStatusTable(rows) {
+    if (!rows.length) {
+      return '<h3>テンプレート × ステータス</h3><p>データがありません。</p>';
+    }
+
+    let html = `
+      <h3>テンプレート × ステータス</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>テンプレートキー</th>
+            <th>テンプレート名</th>
+            <th>ステータス</th>
+            <th>件数</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    for (const row of rows) {
+      html += `
+        <tr>
+          <td>${escapeHtml(row.template_key)}</td>
+          <td>${escapeHtml(row.template_name)}</td>
+          <td>${escapeHtml(row.status)}</td>
+          <td>${escapeHtml(row.count)}</td>
+        </tr>
+      `;
+    }
+
+    html += '</tbody></table>';
+    return html;
+  }
+
+  function renderTopEmails(logs) {
+    const rows = countBy(logs, log => log.email).slice(0, 30);
+    return renderSimpleCountTable('送信先別 件数 上位30件', rows, 'メールアドレス');
+  }
+
+  function renderRecentLogs(logs) {
+    const recent = logs.slice(0, 30);
+
+    if (!recent.length) {
+      return '<h3>直近履歴</h3><p>データがありません。</p>';
+    }
+
+    let html = `
+      <h3>直近履歴 30件</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>送信日時</th>
+            <th>メール</th>
+            <th>テンプレート</th>
+            <th>ステータス</th>
+            <th>Resend ID</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    for (const log of recent) {
+      html += `
+        <tr>
+          <td>${escapeHtml(log.sent_at || '')}</td>
+          <td>${escapeHtml(log.email || '')}</td>
+          <td>${escapeHtml(log.template_name || log.template_key || '')}</td>
+          <td>${escapeHtml(log.status || '')}</td>
+          <td>${escapeHtml(log.resend_email_id || '')}</td>
+        </tr>
+      `;
+    }
+
+    html += '</tbody></table>';
+    return html;
+  }
+
+  async function loadEmailAnalysis() {
+    const status = document.getElementById('analysisStatus');
+    const result = document.getElementById('analysisResult');
+    const body = document.getElementById('analysisBody');
+
+    status.className = 'status';
+    status.textContent = '送信履歴を分析中です...';
+    result.textContent = '';
+    body.innerHTML = '';
+
+    try {
+      const limit = Number(getValue('analysisLimit') || 200);
+      const templateKey = getValue('analysisTemplateKey');
+      const statusFilter = getValue('analysisStatusFilter');
+      const emailFilter = getValue('analysisEmailFilter');
+
+      const payload = {
+        limit: Math.max(1, Math.min(limit, 200))
+      };
+
+      if (templateKey) payload.template_key = templateKey;
+      if (statusFilter) payload.status = statusFilter;
+      if (emailFilter) payload.email = emailFilter;
+
+      const data = await callLogsFunctionForAnalysis(payload);
+      const logs = Array.isArray(data.logs) ? data.logs : [];
+
+      const summary = buildSummary(logs);
+      const byTemplateStatus = countByTemplateAndStatus(logs);
+      const byDate = countBy(logs, log => getDateOnly(log.sent_at));
+      const byTemplate = countBy(logs, log => log.template_name || log.template_key);
+      const byStatus = countBy(logs, log => log.status);
+
+      status.className = 'status success';
+      status.textContent = `分析完了：${logs.length}件`;
+
+      body.innerHTML =
+        renderSummaryCards(summary) +
+        renderTemplateStatusTable(byTemplateStatus) +
+        renderSimpleCountTable('日別送信履歴', byDate, '日付') +
+        renderSimpleCountTable('テンプレート別履歴', byTemplate, 'テンプレート') +
+        renderSimpleCountTable('ステータス別履歴', byStatus, 'ステータス') +
+        renderTopEmails(logs) +
+        renderRecentLogs(logs);
+
+      result.textContent = JSON.stringify({
+        summary,
+        by_template_status: byTemplateStatus,
+        by_date: byDate,
+        by_template: byTemplate,
+        by_status: byStatus
+      }, null, 2);
+    } catch (error) {
+      status.className = 'status error';
+      status.textContent = 'エラーが発生しました。';
+      result.textContent = error.message;
+    }
+  }
+
+  function clearEmailAnalysis() {
+    document.getElementById('analysisStatus').textContent = '';
+    document.getElementById('analysisBody').innerHTML = '';
+    document.getElementById('analysisResult').textContent = 'まだ実行していません。';
+  }
+
+  function addAnalysisTab() {
+    const tabs = document.querySelector('.tabs');
+    const container = document.querySelector('.container');
+
+    if (!tabs || !container) return;
+    if (document.getElementById('analysisTab')) return;
+
+    const button = document.createElement('button');
+    button.className = 'tab-button';
+    button.textContent = '5. 送信履歴分析';
+
+    button.addEventListener('click', function () {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('analysisTab').classList.remove('hidden');
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      button.classList.add('active');
+    });
+
+    tabs.appendChild(button);
+
+    const tab = document.createElement('div');
+    tab.id = 'analysisTab';
+    tab.className = 'tab-content hidden';
+
+    tab.innerHTML = `
+      <div class="card">
+        <h2>5. 送信履歴分析</h2>
+
+        <div class="info">
+          email_logs をもとに、送信数・成功率・テンプレート別件数・日別件数を集計します。<br>
+          開封率・クリック率・到達率は、Resend Webhook連携後に分析可能です。
+        </div>
+
+        <div class="row-3">
+          <div>
+            <label for="analysisLimit">分析件数</label>
+            <input id="analysisLimit" type="number" min="1" max="200" value="200" />
+          </div>
+
+          <div>
+            <label for="analysisTemplateKey">テンプレート</label>
+            <select id="analysisTemplateKey">
+              <option value="">すべて</option>
+              <option value="trial_followup">体験後フォロー</option>
+              <option value="campaign">キャンペーン案内</option>
+              <option value="comeback">再検討フォロー</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="analysisStatusFilter">ステータス</label>
+            <select id="analysisStatusFilter">
+              <option value="">すべて</option>
+              <option value="sent">sent</option>
+              <option value="failed">failed</option>
+              <option value="skipped">skipped</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="analysisEmailFilter">メールアドレスで絞り込み</label>
+        <input id="analysisEmailFilter" type="text" placeholder="例：example@gmail.com。空欄ならすべて" />
+
+        <div class="buttons">
+          <button class="btn-blue" onclick="window.loadEmailAnalysis()">分析を実行</button>
+          <button class="btn-gray" onclick="window.clearEmailAnalysis()">結果をクリア</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>分析結果</h3>
+        <div id="analysisStatus" class="status"></div>
+        <div id="analysisBody"></div>
+        <pre id="analysisResult">まだ実行していません。</pre>
+      </div>
+    `;
+
+    container.appendChild(tab);
+  }
+
+  window.loadEmailAnalysis = loadEmailAnalysis;
+  window.clearEmailAnalysis = clearEmailAnalysis;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addAnalysisTab);
+  } else {
+    addAnalysisTab();
+  }
+})();
+</script>
 </body>
 </html>
