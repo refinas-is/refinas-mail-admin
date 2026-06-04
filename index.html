@@ -6,74 +6,143 @@
   <title>リフィナス メール送信管理</title>
   <style>
     :root {
-      --red: #d71920;
-      --blue: #005bac;
-      --black: #111111;
-      --gray: #f4f4f4;
-      --border: #dddddd;
-      --text: #222222;
+      --ana-blue: #003f8f;
+      --ana-blue-dark: #002b63;
+      --ana-blue-light: #eaf3ff;
+      --accent: #00a3e0;
+      --red: #c90019;
+      --black: #1b1f2a;
+      --gray: #f5f7fb;
+      --border: #d8e0ec;
+      --text: #1f2937;
+      --muted: #667085;
+      --white: #ffffff;
+      --shadow: 0 10px 28px rgba(20, 45, 85, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      background: var(--gray);
+      background:
+        radial-gradient(circle at top left, rgba(0, 163, 224, 0.14), transparent 34%),
+        linear-gradient(180deg, #eef5ff 0%, var(--gray) 290px, var(--gray) 100%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+      letter-spacing: 0.01em;
     }
 
     .container {
-      max-width: 1120px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 28px 16px 64px;
+      padding: 24px 18px 72px;
     }
 
     .header {
-      background: var(--black);
-      color: #ffffff;
-      padding: 24px;
-      border-top: 6px solid var(--red);
-      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, var(--ana-blue-dark) 0%, var(--ana-blue) 56%, #0b65b9 100%);
+      color: var(--white);
+      padding: 28px 30px;
+      border-top: none;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      right: 28px;
+      bottom: 0;
+      width: 220px;
+      height: 5px;
+      background: linear-gradient(90deg, transparent, #ffffff, var(--accent));
+      opacity: 0.9;
     }
 
     .header h1 {
+      position: relative;
       margin: 0;
-      font-size: 22px;
-      letter-spacing: 0.06em;
+      font-size: 24px;
+      letter-spacing: 0.08em;
+      font-weight: 800;
     }
 
     .header p {
-      margin: 8px 0 0;
-      color: #dddddd;
+      position: relative;
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.88);
       font-size: 13px;
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
     .card {
-      background: #ffffff;
-      padding: 22px;
-      border: 1px solid #e5e5e5;
+      background: rgba(255, 255, 255, 0.98);
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2,
+    .card h3 {
+      margin-top: 0;
+      color: var(--ana-blue-dark);
+      letter-spacing: 0.04em;
     }
 
     .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin: 20px 0 18px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
     }
 
     .tab-button {
-      background: #dddddd;
-      color: #222222;
+      background: var(--white);
+      color: var(--ana-blue-dark);
       border: none;
-      padding: 12px 16px;
-      font-weight: bold;
+      border-right: 1px solid var(--border);
+      padding: 15px 14px;
+      font-weight: 800;
       cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .tab-button:last-child {
+      border-right: none;
+    }
+
+    .tab-button:hover {
+      background: var(--ana-blue-light);
     }
 
     .tab-button.active {
-      background: var(--blue);
-      color: #ffffff;
+      background: var(--ana-blue);
+      color: var(--white);
+      box-shadow: inset 0 -4px 0 var(--accent);
     }
 
     .tab-content.hidden {
@@ -82,52 +151,72 @@
 
     label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 7px;
+      font-size: 13px;
+      color: var(--ana-blue-dark);
     }
 
     input, select, textarea {
       width: 100%;
       box-sizing: border-box;
-      padding: 11px 12px;
-      border: 1px solid #cccccc;
+      padding: 12px 13px;
+      border: 1px solid #c9d4e5;
+      border-radius: 10px;
       font-size: 15px;
       margin-bottom: 15px;
-      background: #ffffff;
+      background: var(--white);
+      color: var(--text);
+      transition: border 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(0, 163, 224, 0.16);
     }
 
     textarea {
-      min-height: 180px;
+      min-height: 185px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 16px;
     }
 
     .row-3 {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
+      gap: 16px;
     }
 
     .buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
     button {
       border: none;
-      padding: 13px 18px;
-      font-weight: bold;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-weight: 800;
       cursor: pointer;
       font-size: 14px;
+      letter-spacing: 0.03em;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 63, 143, 0.18);
     }
 
     button:disabled {
@@ -135,97 +224,263 @@
       cursor: not-allowed;
     }
 
-    .btn-blue { background: var(--blue); color: #ffffff; }
-    .btn-red { background: var(--red); color: #ffffff; }
-    .btn-dark { background: var(--black); color: #ffffff; }
-    .btn-gray { background: #dddddd; color: #222222; }
+    .btn-blue {
+      background: var(--ana-blue);
+      color: var(--white);
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: var(--white);
+    }
+
+    .btn-dark {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-gray {
+      background: #e7edf6;
+      color: var(--ana-blue-dark);
+    }
 
     .warning {
-      background: #fff3f3;
-      border-left: 4px solid var(--red);
-      padding: 13px 15px;
-      margin-bottom: 16px;
-      line-height: 1.7;
+      background: #fff4f4;
+      border-left: 5px solid var(--red);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 17px;
+      line-height: 1.75;
       font-size: 14px;
+      color: #4b1d24;
     }
 
     .info {
-      background: #f0f6ff;
-      border-left: 4px solid var(--blue);
-      padding: 13px 15px;
-      margin-bottom: 16px;
-      line-height: 1.7;
+      background: var(--ana-blue-light);
+      border-left: 5px solid var(--accent);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 17px;
+      line-height: 1.75;
       font-size: 14px;
+      color: #173b68;
     }
 
     .note {
-      color: #666666;
+      color: var(--muted);
       font-size: 13px;
-      line-height: 1.7;
-      margin: 0 0 12px;
+      line-height: 1.8;
+      margin: 0 0 13px;
     }
 
     .status {
-      font-weight: bold;
+      font-weight: 800;
       margin: 14px 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f7f9fc;
+      color: var(--ana-blue-dark);
     }
 
-    .success { color: var(--blue); }
-    .error { color: var(--red); }
+    .success {
+      color: var(--ana-blue);
+      background: #eff7ff;
+    }
+
+    .error {
+      color: var(--red);
+      background: #fff1f2;
+    }
 
     pre {
-      background: var(--black);
-      color: #eeeeee;
-      padding: 14px;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 16px;
       overflow-x: auto;
       white-space: pre-wrap;
-      line-height: 1.6;
+      line-height: 1.65;
       font-size: 13px;
-      min-height: 70px;
+      min-height: 74px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       margin-top: 14px;
       font-size: 13px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
     }
 
     th, td {
-      border: 1px solid var(--border);
-      padding: 9px;
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
       text-align: left;
       vertical-align: top;
       word-break: break-word;
     }
 
+    tr:last-child td {
+      border-bottom: none;
+    }
+
     th {
-      background: #f2f2f2;
+      background: #eef4fb;
+      color: var(--ana-blue-dark);
+      font-weight: 800;
     }
 
     .badge {
       display: inline-block;
-      padding: 3px 8px;
+      padding: 4px 9px;
+      border-radius: 999px;
       background: #eeeeee;
       font-size: 12px;
-      font-weight: bold;
+      font-weight: 800;
     }
 
-    .badge-ready { background: #f0f6ff; color: var(--blue); }
-    .badge-sent { background: #eef8ee; color: #217a21; }
-    .badge-failed { background: #fff3f3; color: var(--red); }
+    .badge-ready {
+      background: var(--ana-blue-light);
+      color: var(--ana-blue);
+    }
+
+    .badge-sent {
+      background: #eaf8ef;
+      color: #157347;
+    }
+
+    .badge-failed {
+      background: #fff1f2;
+      color: var(--red);
+    }
+
+    @media (max-width: 900px) {
+      .tabs {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tab-button {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
 
     @media (max-width: 800px) {
       .row, .row-3 {
         grid-template-columns: 1fr;
       }
+
       .buttons {
         flex-direction: column;
       }
+
       button {
         width: 100%;
       }
+
+      .header {
+        padding: 24px 20px;
+      }
     }
+
+    .settings-accordion {
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .settings-accordion summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, var(--ana-blue-dark) 0%, var(--ana-blue) 100%);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-weight: 800;
+      font-size: 18px;
+      user-select: none;
+    }
+
+    .settings-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .settings-summary-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .settings-summary-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .settings-summary-sub {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .settings-summary-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.92);
+      white-space: nowrap;
+    }
+
+    .settings-arrow {
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+      margin-top: -4px;
+    }
+
+    .settings-accordion[open] .settings-arrow {
+      transform: rotate(225deg);
+      margin-top: 4px;
+    }
+
+    .settings-body {
+      padding: 22px;
+      background: #fff;
+    }
+
+    .settings-top-note {
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 800px) {
+      .settings-accordion summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .settings-summary-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
   </style>
 </head>
 
@@ -234,53 +489,68 @@
     <div class="header">
       <h1>リフィナス メール送信管理</h1>
       <p>
-        セキュリティと誤送信防止を優先した管理画面です。<br>
+        セキュリティと誤送信防止を優先した管理画面です。<br />
         リスト取込、送信対象作成、本送信、履歴確認をそれぞれ別Functionで実行します。
       </p>
     </div>
 
-    <div class="card">
-      <div class="warning">
-        GitHub Pagesは公開ページです。送信用秘密キーをHTML内に保存しないでください。この画面では毎回入力します。
-      </div>
-
-      <label for="sendSecret">送信用秘密キー</label>
-      <input id="sendSecret" type="password" placeholder="Supabase Secrets の SEND_EMAIL_SECRET" />
-
-      <div class="row">
-        <div>
-          <label for="importUrl">リスト取込 Function URL</label>
-          <input id="importUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/import-trial-users" />
+    <details class="settings-accordion">
+      <summary>
+        <div class="settings-summary-left">
+          <span class="settings-summary-title">接続設定 / Function URL</span>
+          <span class="settings-summary-sub">送信用秘密キー・各Function URLの設定</span>
         </div>
-        <div>
-          <label for="createBatchUrl">送信対象作成 Function URL</label>
-          <input id="createBatchUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/create-send-batch" />
-        </div>
-      </div>
 
-      <div class="row">
-        <div>
-          <label for="sendBatchUrl">本送信 Function URL</label>
-          <input id="sendBatchUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/send-approved-batch" />
+        <div class="settings-summary-right">
+          <span>設定を表示</span>
+          <span class="settings-arrow"></span>
         </div>
-        <div>
-          <label for="logsUrl">送信履歴 Function URL</label>
-          <input id="logsUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/get-email-logs" />
-        </div>
-      </div>
+      </summary>
 
-      <div class="buttons">
-        <button class="btn-gray" onclick="saveSettings()">URLをこのブラウザに保存</button>
-        <button class="btn-gray" onclick="clearSettings()">保存URLを削除</button>
+      <div class="settings-body">
+        <div class="warning settings-top-note">
+          GitHub Pagesは公開ページです。送信用秘密キーをHTML内に保存しないでください。この画面では毎回入力します。
+        </div>
+
+        <label for="sendSecret">送信用秘密キー</label>
+        <input id="sendSecret" type="password" placeholder="Supabase Secrets の SEND_EMAIL_SECRET" />
+
+        <div class="row">
+          <div>
+            <label for="importUrl">リスト取込 Function URL</label>
+            <input id="importUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/import-trial-users" />
+          </div>
+          <div>
+            <label for="createBatchUrl">送信対象作成 Function URL</label>
+            <input id="createBatchUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/create-send-batch" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="sendBatchUrl">本送信 Function URL</label>
+            <input id="sendBatchUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/send-approved-batch" />
+          </div>
+          <div>
+            <label for="logsUrl">送信履歴分析 Function URL</label>
+            <input id="logsUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/get-email-logs" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn-gray" onclick="saveSettings()">URLをこのブラウザに保存</button>
+          <button class="btn-gray" onclick="clearSettings()">保存URLを削除</button>
+        </div>
+
+        <p class="note">URLのみブラウザに保存します。秘密キーは保存しません。</p>
       </div>
-      <p class="note">URLのみブラウザに保存します。秘密キーは保存しません。</p>
-    </div>
+    </details>
 
     <div class="tabs">
       <button class="tab-button active" onclick="showTab('importTab', this)">1. リスト取込</button>
       <button class="tab-button" onclick="showTab('createBatchTab', this)">2. 送信対象作成</button>
       <button class="tab-button" onclick="showTab('sendBatchTab', this)">3. 送信承認・本送信</button>
-      <button class="tab-button" onclick="showTab('logsTab', this)">4. 送信履歴</button>
+      <button class="tab-button" onclick="showTab('analysisTab', this)">4. 送信履歴分析</button>
     </div>
 
     <div id="importTab" class="tab-content">
@@ -291,9 +561,9 @@
         </div>
 
         <p class="note">
-          CSVまたはタブ区切りで貼り付けてください。1行目はヘッダー必須です。<br>
-          「リフィナス元CSV形式」を選ぶと、以下の列名から自動変換します。<br>
-          登録店舗 → store_name / 名前 → name / メールアドレス1 → email / 会員登録日 → trial_date / 会員登録区分 → joined<br>
+          CSVまたはタブ区切りで貼り付けてください。1行目はヘッダー必須です。<br />
+          「リフィナス元CSV形式」を選ぶと、以下の列名から自動変換します。<br />
+          登録店舗 → store_name / 名前 → name / メールアドレス1 → email / 会員登録日 → trial_date / 会員登録区分 → joined<br />
           ステータス列は取り込みません。
         </p>
 
@@ -309,7 +579,10 @@
           CSVファイルを選ぶと、下の取込データ欄に自動で読み込みます。文字化けする場合は、元CSVをUTF-8で保存し直してください。
         </p>
 
-        <textarea id="importText" placeholder="登録店舗,名前(カナ),名前,郵便番号,都道府県,市区町村,丁目・番地,電話番号,メールアドレス1,生年月日,性別,会員登録日,ステータス,年齢,職業,初回来店動機,会員登録区分,会員種別,コース&#10;渋谷本店,ヤマダタロウ,山田太郎,0000000,東京都,渋谷区,xxx,09000000000,test@example.com,1990-01-01,男性,2026-05-20,通常,30,会社員,Web,未入会,体験,通常"></textarea>
+        <textarea
+          id="importText"
+          placeholder="登録店舗,名前(カナ),名前,郵便番号,都道府県,市区町村,丁目・番地,電話番号,メールアドレス1,生年月日,性別,会員登録日,ステータス,年齢,職業,初回来店動機,会員登録区分,会員種別,コース&#10;渋谷本店,ヤマダタロウ,山田太郎,0000000,東京都,渋谷区,xxx,09000000000,test@example.com,1990-01-01,男性,2026-05-20,通常,30,会社員,Web,未入会,体験,通常"
+        ></textarea>
 
         <div class="row">
           <div>
@@ -402,7 +675,7 @@
       <div class="card">
         <h2>3. 送信承認・本送信</h2>
         <div class="warning">
-          本送信は実際にメールが送信されます。<br>
+          本送信は実際にメールが送信されます。<br />
           送信対象作成の結果を確認し、バッチIDと確認文言を入力してください。
         </div>
 
@@ -443,18 +716,29 @@
       </div>
     </div>
 
-    <div id="logsTab" class="tab-content hidden">
+    <div id="analysisTab" class="tab-content hidden">
       <div class="card">
-        <h2>4. 送信履歴</h2>
+        <h2>4. 送信履歴分析</h2>
+        <div class="info">
+          email_logs をもとに、送信数・成功率・テンプレート別件数・日別件数を集計します。<br>
+          送信日時で期間指定できます。開封率・クリック率・到達率は、Resend Webhook連携後に分析可能です。
+        </div>
 
-        <div class="row-3">
+        <div class="row">
           <div>
-            <label for="logLimit">表示件数</label>
-            <input id="logLimit" type="number" min="1" max="200" value="50" />
+            <label for="analysisDateFrom">送信日時 開始日</label>
+            <input id="analysisDateFrom" type="date" />
           </div>
           <div>
-            <label for="logTemplateKey">テンプレート</label>
-            <select id="logTemplateKey">
+            <label for="analysisDateTo">送信日時 終了日</label>
+            <input id="analysisDateTo" type="date" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="analysisTemplateKey">テンプレート</label>
+            <select id="analysisTemplateKey">
               <option value="">すべて</option>
               <option value="trial_followup">体験後フォロー</option>
               <option value="campaign">キャンペーン案内</option>
@@ -462,8 +746,8 @@
             </select>
           </div>
           <div>
-            <label for="logStatusFilter">ステータス</label>
-            <select id="logStatusFilter">
+            <label for="analysisStatusFilter">ステータス</label>
+            <select id="analysisStatusFilter">
               <option value="">すべて</option>
               <option value="sent">sent</option>
               <option value="failed">failed</option>
@@ -472,29 +756,46 @@
           </div>
         </div>
 
-        <label for="logEmailFilter">メールアドレスで絞り込み</label>
-        <input id="logEmailFilter" type="text" placeholder="例：example@gmail.com。空欄ならすべて" />
+        <label for="analysisEmailFilter">メールアドレスで絞り込み</label>
+        <input id="analysisEmailFilter" type="text" placeholder="例：example@gmail.com。空欄ならすべて" />
 
         <div class="buttons">
-          <button class="btn-blue" onclick="loadEmailLogs()">履歴を取得</button>
-          <button class="btn-gray" onclick="clearResult('logs')">結果をクリア</button>
+          <button class="btn-blue" onclick="loadEmailAnalysis()">分析を実行</button>
+          <button class="btn-gray" onclick="clearResult('analysis')">結果をクリア</button>
         </div>
       </div>
 
       <div class="card">
-        <h3>履歴結果</h3>
-        <div id="logsStatus" class="status"></div>
-        <div id="logsTable"></div>
-        <pre id="logsResult">まだ実行していません。</pre>
+        <h3>分析結果</h3>
+        <div id="analysisStatus" class="status"></div>
+        <div id="analysisBody"></div>
+        <pre id="analysisResult">まだ実行していません。</pre>
       </div>
     </div>
+
   </div>
 
   <script>
     const STORAGE_KEY = 'refinasMailAdminUrls';
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', function () {
       setupCsvFileReader();
+      loadSettings();
+    });
+
+    function saveSettings() {
+      const data = {
+        importUrl: document.getElementById('importUrl').value.trim(),
+        createBatchUrl: document.getElementById('createBatchUrl').value.trim(),
+        sendBatchUrl: document.getElementById('sendBatchUrl').value.trim(),
+        logsUrl: document.getElementById('logsUrl').value.trim()
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      alert('URLをこのブラウザに保存しました。秘密キーは保存していません。');
+    }
+
+    function loadSettings() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return;
 
@@ -505,69 +806,6 @@
         document.getElementById('sendBatchUrl').value = data.sendBatchUrl || '';
         document.getElementById('logsUrl').value = data.logsUrl || '';
       } catch (_) {}
-    });
-
-
-    function setupCsvFileReader() {
-      const input = document.getElementById('csvFile');
-      if (!input) return;
-
-      input.addEventListener('change', async function () {
-        const file = input.files && input.files[0];
-        if (!file) return;
-
-        const status = document.getElementById('importStatus');
-        const result = document.getElementById('importResult');
-
-        try {
-          status.className = 'status';
-          status.textContent = 'CSVファイルを読み込み中です...';
-
-          const text = await readFileAsText(file);
-          document.getElementById('importText').value = text;
-
-          status.className = 'status success';
-          status.textContent = `CSVファイルを読み込みました：${file.name}`;
-
-          // 読み込み後にプレビューまで自動実行
-          previewImport();
-        } catch (error) {
-          status.className = 'status error';
-          status.textContent = 'CSVファイルの読み込みに失敗しました。';
-          result.textContent = error.message;
-        }
-      });
-    }
-
-    function readFileAsText(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          let text = String(reader.result || '');
-
-          // UTF-8 BOMを除去
-          text = text.replace(/^\uFEFF/, '');
-
-          resolve(text);
-        };
-
-        reader.onerror = () => reject(new Error('ファイルを読み込めませんでした。'));
-
-        // 基本はUTF-8で読み込み
-        reader.readAsText(file, 'UTF-8');
-      });
-    }
-
-    function saveSettings() {
-      const data = {
-        importUrl: document.getElementById('importUrl').value.trim(),
-        createBatchUrl: document.getElementById('createBatchUrl').value.trim(),
-        sendBatchUrl: document.getElementById('sendBatchUrl').value.trim(),
-        logsUrl: document.getElementById('logsUrl').value.trim()
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      alert('URLをこのブラウザに保存しました。秘密キーは保存していません。');
     }
 
     function clearSettings() {
@@ -576,9 +814,16 @@
     }
 
     function showTab(tabId, button) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-content').forEach(function (el) {
+        el.classList.add('hidden');
+      });
+
       document.getElementById(tabId).classList.remove('hidden');
-      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+      document.querySelectorAll('.tab-button').forEach(function (el) {
+        el.classList.remove('active');
+      });
+
       button.classList.add('active');
     }
 
@@ -604,7 +849,9 @@
         body: JSON.stringify(payload)
       });
 
-      const data = await response.json().catch(() => null);
+      const data = await response.json().catch(function () {
+        return null;
+      });
 
       if (!response.ok) {
         throw new Error(JSON.stringify(data, null, 2));
@@ -614,10 +861,56 @@
     }
 
     function setLoading(isLoading) {
-      document.querySelectorAll('button').forEach(button => {
+      document.querySelectorAll('button').forEach(function (button) {
         if (!button.classList.contains('tab-button')) {
           button.disabled = isLoading;
         }
+      });
+    }
+
+    function setupCsvFileReader() {
+      const input = document.getElementById('csvFile');
+      if (!input) return;
+
+      input.addEventListener('change', async function () {
+        const file = input.files && input.files[0];
+        if (!file) return;
+
+        const status = document.getElementById('importStatus');
+        const result = document.getElementById('importResult');
+
+        try {
+          status.className = 'status';
+          status.textContent = 'CSVファイルを読み込み中です...';
+
+          const text = await readFileAsText(file);
+          document.getElementById('importText').value = text.replace(/^\uFEFF/, '');
+
+          status.className = 'status success';
+          status.textContent = `CSVファイルを読み込みました：${file.name}`;
+
+          previewImport();
+        } catch (error) {
+          status.className = 'status error';
+          status.textContent = 'CSVファイルの読み込みに失敗しました。';
+          result.textContent = error.message;
+        }
+      });
+    }
+
+    function readFileAsText(file) {
+      return new Promise(function (resolve, reject) {
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          resolve(String(reader.result || ''));
+        };
+
+        reader.onerror = function () {
+          reject(new Error('ファイルを読み込めませんでした。'));
+        };
+
+        reader.readAsText(file, 'UTF-8');
       });
     }
 
@@ -648,7 +941,9 @@
     }
 
     function parseBoolean(value, defaultValue) {
-      if (value === undefined || value === null || String(value).trim() === '') return defaultValue;
+      if (value === undefined || value === null || String(value).trim() === '') {
+        return defaultValue;
+      }
 
       const v = String(value).trim().toLowerCase();
 
@@ -659,7 +954,9 @@
     }
 
     function normalizeDate(value) {
-      if (value === undefined || value === null || String(value).trim() === '') return null;
+      if (value === undefined || value === null || String(value).trim() === '') {
+        return null;
+      }
 
       const raw = String(value).trim();
 
@@ -667,10 +964,7 @@
 
       const slashMatch = raw.match(/^(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})$/);
       if (slashMatch) {
-        const y = slashMatch[1];
-        const m = slashMatch[2].padStart(2, '0');
-        const d = slashMatch[3].padStart(2, '0');
-        return `${y}-${m}-${d}`;
+        return `${slashMatch[1]}-${slashMatch[2].padStart(2, '0')}-${slashMatch[3].padStart(2, '0')}`;
       }
 
       const compactMatch = raw.match(/^(\d{4})(\d{2})(\d{2})$/);
@@ -680,10 +974,7 @@
 
       const jpMatch = raw.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
       if (jpMatch) {
-        const y = jpMatch[1];
-        const m = jpMatch[2].padStart(2, '0');
-        const d = jpMatch[3].padStart(2, '0');
-        return `${y}-${m}-${d}`;
+        return `${jpMatch[1]}-${jpMatch[2].padStart(2, '0')}-${jpMatch[3].padStart(2, '0')}`;
       }
 
       throw new Error(`日付形式を変換できません：${raw}。YYYY-MM-DD、YYYY/MM/DD、YYYYMMDD のいずれかにしてください。`);
@@ -713,80 +1004,100 @@
     function parseImportText() {
       const text = document.getElementById('importText').value.trim();
       const defaultCanSend = document.getElementById('defaultCanSend').value === 'true';
-      const csvFormat = document.getElementById('csvFormat') ? document.getElementById('csvFormat').value : 'standard';
+      const csvFormat = document.getElementById('csvFormat').value;
 
       if (!text) throw new Error('取込データを入力してください。');
 
-      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+      const lines = text.split(/\r?\n/).filter(function (line) {
+        return line.trim() !== '';
+      });
+
       if (lines.length < 2) throw new Error('ヘッダー行とデータ行が必要です。');
 
       const delimiter = lines[0].includes('\t') ? '\t' : ',';
-      const headers = parseCsvLine(lines[0], delimiter).map(h => h.trim());
+      const headers = parseCsvLine(lines[0], delimiter).map(function (h) {
+        return h.trim();
+      });
 
-      const records = [];
-
-      if (csvFormat === 'standard') {
-        for (const required of ['name', 'email']) {
-          if (!headers.includes(required)) throw new Error(`必須列 ${required} がありません。`);
-        }
-
-        for (let i = 1; i < lines.length; i++) {
-          const values = parseCsvLine(lines[i], delimiter);
-          const row = {};
-          headers.forEach((header, index) => {
-            row[header] = (values[index] || '').trim();
-          });
-
-          if (!row.name || !row.email) continue;
-
-          records.push({
-            name: row.name,
-            email: row.email,
-            store_name: row.store_name || null,
-            trial_date: normalizeDate(row.trial_date),
-            joined: parseBoolean(row.joined, false),
-            can_send: parseBoolean(row.can_send, defaultCanSend),
-            notes: row.notes || null
-          });
-        }
-      } else {
-        const requiredOriginalHeaders = ['登録店舗', '名前', 'メールアドレス1', '会員登録日', '会員登録区分'];
-
-        for (const required of requiredOriginalHeaders) {
-          if (!headers.includes(required)) {
-            throw new Error(`リフィナス元CSV形式に必要な列 ${required} がありません。`);
-          }
-        }
-
-        for (let i = 1; i < lines.length; i++) {
-          const values = parseCsvLine(lines[i], delimiter);
-          const row = {};
-          headers.forEach((header, index) => {
-            row[header] = (values[index] || '').trim();
-          });
-
-          const name = row['名前'];
-          const email = row['メールアドレス1'];
-
-          if (!name || !email) continue;
-
-          const memberRegistrationType = row['会員登録区分'] || '';
-
-          records.push({
-            name: name,
-            email: email,
-            store_name: row['登録店舗'] || null,
-            trial_date: normalizeDate(row['会員登録日']),
-            joined: parseJoinedFromMemberRegistrationType(memberRegistrationType),
-            can_send: defaultCanSend,
-            notes: memberRegistrationType ? `会員登録区分:${memberRegistrationType}` : null
-          });
-        }
-      }
+      const records = csvFormat === 'standard'
+        ? parseStandardRecords(lines, headers, delimiter, defaultCanSend)
+        : parseRefinasRecords(lines, headers, delimiter, defaultCanSend);
 
       if (!records.length) throw new Error('取込対象のデータがありません。');
 
       return records;
+    }
+
+    function parseStandardRecords(lines, headers, delimiter, defaultCanSend) {
+      for (const required of ['name', 'email']) {
+        if (!headers.includes(required)) {
+          throw new Error(`必須列 ${required} がありません。`);
+        }
+      }
+
+      const records = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = buildRowObject(lines[i], headers, delimiter);
+        if (!row.name || !row.email) continue;
+
+        records.push({
+          name: row.name,
+          email: row.email,
+          store_name: row.store_name || null,
+          trial_date: normalizeDate(row.trial_date),
+          joined: parseBoolean(row.joined, false),
+          can_send: parseBoolean(row.can_send, defaultCanSend),
+          notes: row.notes || null
+        });
+      }
+
+      return records;
+    }
+
+    function parseRefinasRecords(lines, headers, delimiter, defaultCanSend) {
+      const requiredHeaders = ['登録店舗', '名前', 'メールアドレス1', '会員登録日', '会員登録区分'];
+
+      for (const required of requiredHeaders) {
+        if (!headers.includes(required)) {
+          throw new Error(`リフィナス元CSV形式に必要な列 ${required} がありません。`);
+        }
+      }
+
+      const records = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = buildRowObject(lines[i], headers, delimiter);
+        const name = row['名前'];
+        const email = row['メールアドレス1'];
+
+        if (!name || !email) continue;
+
+        const memberRegistrationType = row['会員登録区分'] || '';
+
+        records.push({
+          name,
+          email,
+          store_name: row['登録店舗'] || null,
+          trial_date: normalizeDate(row['会員登録日']),
+          joined: parseJoinedFromMemberRegistrationType(memberRegistrationType),
+          can_send: defaultCanSend,
+          notes: memberRegistrationType ? `会員登録区分:${memberRegistrationType}` : null
+        });
+      }
+
+      return records;
+    }
+
+    function buildRowObject(line, headers, delimiter) {
+      const values = parseCsvLine(line, delimiter);
+      const row = {};
+
+      headers.forEach(function (header, index) {
+        row[header] = (values[index] || '').trim();
+      });
+
+      return row;
     }
 
     function previewImport() {
@@ -825,9 +1136,7 @@
         status.className = 'status';
         status.textContent = '取込中です...';
 
-        const url = getUrl('importUrl', 'リスト取込 Function URL');
-
-        const data = await callFunction(url, {
+        const data = await callFunction(getUrl('importUrl', 'リスト取込 Function URL'), {
           import_mode: document.getElementById('importMode').value,
           records
         });
@@ -854,8 +1163,6 @@
       const result = document.getElementById('batchResult');
 
       try {
-        const url = getUrl('createBatchUrl', '送信対象作成 Function URL');
-
         const payload = {
           template_key: document.getElementById('templateKey').value,
           limit: Number(document.getElementById('targetLimit').value || 50)
@@ -874,7 +1181,7 @@
         status.className = 'status';
         status.textContent = '送信対象を作成中です...';
 
-        const data = await callFunction(url, payload);
+        const data = await callFunction(getUrl('createBatchUrl', '送信対象作成 Function URL'), payload);
 
         if (data.batch && data.batch.id) {
           document.getElementById('batchId').value = data.batch.id;
@@ -927,8 +1234,6 @@
       const result = document.getElementById('sendResult');
 
       try {
-        const url = getUrl('sendBatchUrl', '本送信 Function URL');
-
         const payload = {
           batch_id: batchId,
           confirm_text: confirmText
@@ -947,54 +1252,13 @@
         status.className = 'status';
         status.textContent = '本送信中です...';
 
-        const data = await callFunction(url, payload);
+        const data = await callFunction(getUrl('sendBatchUrl', '本送信 Function URL'), payload);
 
         status.className = 'status success';
         status.textContent =
           `送信完了：成功 ${data.sent_count || 0}件 / 失敗 ${data.failed_count || 0}件 / スキップ ${data.skipped_count || 0}件`;
 
         renderSendResults(data.results || [], 'sendTable');
-        result.textContent = JSON.stringify(data, null, 2);
-      } catch (error) {
-        status.className = 'status error';
-        status.textContent = 'エラーが発生しました。';
-        result.textContent = error.message;
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    async function loadEmailLogs() {
-      clearDisplayOnly('logs');
-      setLoading(true);
-
-      const status = document.getElementById('logsStatus');
-      const result = document.getElementById('logsResult');
-
-      try {
-        const url = getUrl('logsUrl', '送信履歴 Function URL');
-
-        const payload = {
-          limit: Number(document.getElementById('logLimit').value || 50)
-        };
-
-        const templateKey = document.getElementById('logTemplateKey').value;
-        const statusFilter = document.getElementById('logStatusFilter').value;
-        const emailFilter = document.getElementById('logEmailFilter').value.trim();
-
-        if (templateKey) payload.template_key = templateKey;
-        if (statusFilter) payload.status = statusFilter;
-        if (emailFilter) payload.email = emailFilter;
-
-        status.className = 'status';
-        status.textContent = '履歴を取得中です...';
-
-        const data = await callFunction(url, payload);
-
-        status.className = 'status success';
-        status.textContent = `履歴取得完了：${data.count || 0}件`;
-
-        renderLogs(data.logs || [], 'logsTable');
         result.textContent = JSON.stringify(data, null, 2);
       } catch (error) {
         status.className = 'status error';
@@ -1077,30 +1341,277 @@
       target.innerHTML = html;
     }
 
-    function renderLogs(logs, elementId) {
-      const target = document.getElementById(elementId);
-      if (!logs.length) {
-        target.innerHTML = '<p>履歴はありません。</p>';
-        return;
-      }
 
-      let html = '<table><thead><tr><th>送信日時</th><th>メール</th><th>テンプレート</th><th>キー</th><th>結果</th><th>Resend ID</th><th>エラー</th></tr></thead><tbody>';
+    function getDateOnly(value) {
+      if (!value) return '';
+      return String(value).slice(0, 10);
+    }
+
+    function countBy(logs, keyGetter) {
+      const map = new Map();
 
       for (const log of logs) {
-        const cls = log.status === 'sent' ? 'badge-sent' : log.status === 'failed' ? 'badge-failed' : '';
-        html += `<tr>
-          <td>${escapeHtml(log.sent_at || '')}</td>
-          <td>${escapeHtml(log.email || '')}</td>
-          <td>${escapeHtml(log.template_name || '')}</td>
-          <td>${escapeHtml(log.template_key || '')}</td>
-          <td><span class="badge ${cls}">${escapeHtml(log.status || '')}</span></td>
-          <td>${escapeHtml(log.resend_email_id || '')}</td>
-          <td>${escapeHtml(log.error_message || '')}</td>
-        </tr>`;
+        const key = keyGetter(log) || '未設定';
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+
+      return Array.from(map.entries())
+        .map(([key, count]) => ({ key, count }))
+        .sort((a, b) => b.count - a.count || String(a.key).localeCompare(String(b.key), 'ja'));
+    }
+
+    function countByTemplateAndStatus(logs) {
+      const map = new Map();
+
+      for (const log of logs) {
+        const template = log.template_key || '未設定';
+        const status = log.status || '未設定';
+        const key = `${template}||${status}`;
+
+        if (!map.has(key)) {
+          map.set(key, {
+            template_key: template,
+            template_name: log.template_name || '',
+            status,
+            count: 0
+          });
+        }
+
+        map.get(key).count += 1;
+      }
+
+      return Array.from(map.values())
+        .sort((a, b) => String(a.template_key).localeCompare(String(b.template_key), 'ja') || String(a.status).localeCompare(String(b.status), 'ja'));
+    }
+
+    function buildAnalysisSummary(logs) {
+      const total = logs.length;
+      const sent = logs.filter(log => log.status === 'sent').length;
+      const failed = logs.filter(log => log.status === 'failed').length;
+      const skipped = logs.filter(log => log.status === 'skipped').length;
+      const uniqueEmails = new Set(logs.map(log => log.email).filter(Boolean)).size;
+      const latestSentAt = logs.length ? logs.map(log => log.sent_at).filter(Boolean).sort().reverse()[0] : '';
+
+      return {
+        total,
+        sent,
+        failed,
+        skipped,
+        uniqueEmails,
+        successRate: total ? Math.round((sent / total) * 1000) / 10 : 0,
+        latestSentAt
+      };
+    }
+
+    function renderAnalysisSummary(summary) {
+      return `
+        <div class="row-3">
+          <div class="card" style="margin-bottom: 10px;">
+            <strong>総履歴数</strong><br>
+            <span style="font-size: 24px;">${escapeHtml(summary.total)}</span>
+          </div>
+          <div class="card" style="margin-bottom: 10px;">
+            <strong>送信成功</strong><br>
+            <span style="font-size: 24px;">${escapeHtml(summary.sent)}</span>
+          </div>
+          <div class="card" style="margin-bottom: 10px;">
+            <strong>成功率</strong><br>
+            <span style="font-size: 24px;">${escapeHtml(summary.successRate)}%</span>
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="card" style="margin-bottom: 10px;">
+            <strong>失敗</strong><br>
+            <span style="font-size: 24px;">${escapeHtml(summary.failed)}</span>
+          </div>
+          <div class="card" style="margin-bottom: 10px;">
+            <strong>スキップ</strong><br>
+            <span style="font-size: 24px;">${escapeHtml(summary.skipped)}</span>
+          </div>
+          <div class="card" style="margin-bottom: 10px;">
+            <strong>送信先ユニーク数</strong><br>
+            <span style="font-size: 24px;">${escapeHtml(summary.uniqueEmails)}</span>
+          </div>
+        </div>
+        <p class="note">最新送信日時：${escapeHtml(summary.latestSentAt || 'なし')}</p>
+      `;
+    }
+
+    function renderCountTable(title, rows, keyLabel) {
+      if (!rows.length) {
+        return `<h3>${escapeHtml(title)}</h3><p>データがありません。</p>`;
+      }
+
+      let html = `
+        <h3>${escapeHtml(title)}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>${escapeHtml(keyLabel)}</th>
+              <th>件数</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const row of rows) {
+        html += `
+          <tr>
+            <td>${escapeHtml(row.key)}</td>
+            <td>${escapeHtml(row.count)}</td>
+          </tr>
+        `;
       }
 
       html += '</tbody></table>';
-      target.innerHTML = html;
+      return html;
+    }
+
+    function renderTemplateStatusTable(rows) {
+      if (!rows.length) {
+        return '<h3>テンプレート × ステータス</h3><p>データがありません。</p>';
+      }
+
+      let html = `
+        <h3>テンプレート × ステータス</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>テンプレートキー</th>
+              <th>テンプレート名</th>
+              <th>ステータス</th>
+              <th>件数</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const row of rows) {
+        html += `
+          <tr>
+            <td>${escapeHtml(row.template_key)}</td>
+            <td>${escapeHtml(row.template_name)}</td>
+            <td>${escapeHtml(row.status)}</td>
+            <td>${escapeHtml(row.count)}</td>
+          </tr>
+        `;
+      }
+
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function renderRecentAnalysisLogs(logs) {
+      const recent = logs.slice(0, 30);
+
+      if (!recent.length) {
+        return '<h3>直近履歴</h3><p>データがありません。</p>';
+      }
+
+      let html = `
+        <h3>直近履歴 30件</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>送信日時</th>
+              <th>メール</th>
+              <th>テンプレート</th>
+              <th>ステータス</th>
+              <th>Resend ID</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const log of recent) {
+        html += `
+          <tr>
+            <td>${escapeHtml(log.sent_at || '')}</td>
+            <td>${escapeHtml(log.email || '')}</td>
+            <td>${escapeHtml(log.template_name || log.template_key || '')}</td>
+            <td>${escapeHtml(log.status || '')}</td>
+            <td>${escapeHtml(log.resend_email_id || '')}</td>
+          </tr>
+        `;
+      }
+
+      html += '</tbody></table>';
+      return html;
+    }
+
+    async function loadEmailAnalysis() {
+      clearDisplayOnly('analysis');
+      setLoading(true);
+
+      const status = document.getElementById('analysisStatus');
+      const result = document.getElementById('analysisResult');
+      const body = document.getElementById('analysisBody');
+
+      try {
+        const url = getUrl('logsUrl', '送信履歴分析 Function URL');
+
+        const payload = {
+          limit: 1000
+        };
+
+        const dateFrom = document.getElementById('analysisDateFrom').value;
+        const dateTo = document.getElementById('analysisDateTo').value;
+        const templateKey = document.getElementById('analysisTemplateKey').value;
+        const statusFilter = document.getElementById('analysisStatusFilter').value;
+        const emailFilter = document.getElementById('analysisEmailFilter').value.trim();
+
+        if (dateFrom) payload.date_from = dateFrom;
+        if (dateTo) payload.date_to = dateTo;
+        if (templateKey) payload.template_key = templateKey;
+        if (statusFilter) payload.status = statusFilter;
+        if (emailFilter) payload.email = emailFilter;
+
+        status.className = 'status';
+        status.textContent = '送信履歴を分析中です...';
+
+        const data = await callFunction(url, payload);
+        const logs = Array.isArray(data.logs) ? data.logs : [];
+
+        const summary = buildAnalysisSummary(logs);
+        const byTemplateStatus = countByTemplateAndStatus(logs);
+        const byDate = countBy(logs, log => getDateOnly(log.sent_at));
+        const byTemplate = countBy(logs, log => log.template_name || log.template_key);
+        const byStatus = countBy(logs, log => log.status);
+        const topEmails = countBy(logs, log => log.email).slice(0, 30);
+
+        status.className = 'status success';
+        status.textContent = `分析完了：${logs.length}件`;
+
+        body.innerHTML =
+          renderAnalysisSummary(summary) +
+          renderTemplateStatusTable(byTemplateStatus) +
+          renderCountTable('日別送信履歴', byDate, '日付') +
+          renderCountTable('テンプレート別履歴', byTemplate, 'テンプレート') +
+          renderCountTable('ステータス別履歴', byStatus, 'ステータス') +
+          renderCountTable('送信先別 件数 上位30件', topEmails, 'メールアドレス') +
+          renderRecentAnalysisLogs(logs);
+
+        result.textContent = JSON.stringify({
+          filters: {
+            date_from: dateFrom || null,
+            date_to: dateTo || null,
+            template_key: templateKey || null,
+            status: statusFilter || null,
+            email: emailFilter || null
+          },
+          summary,
+          by_template_status: byTemplateStatus,
+          by_date: byDate,
+          by_template: byTemplate,
+          by_status: byStatus
+        }, null, 2);
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = 'エラーが発生しました。';
+        result.textContent = error.message;
+      } finally {
+        setLoading(false);
+      }
     }
 
     function clearDisplayOnly(type) {
@@ -1108,7 +1619,8 @@
         import: ['importStatus', 'importTable', 'importResult'],
         batch: ['batchStatus', 'batchTable', 'batchResult'],
         send: ['sendStatus', 'sendTable', 'sendResult'],
-        logs: ['logsStatus', 'logsTable', 'logsResult']
+        analysis: ['analysisStatus', 'analysisBody', 'analysisResult'],
+        analysis: ['analysisStatus', 'analysisBody', 'analysisResult']
       };
 
       const ids = map[type];
@@ -1119,12 +1631,15 @@
 
     function clearResult(type) {
       clearDisplayOnly(type);
+
       const resultId = {
         import: 'importResult',
         batch: 'batchResult',
         send: 'sendResult',
-        logs: 'logsResult'
+        analysis: 'analysisResult',
+        analysis: 'analysisResult'
       }[type];
+
       document.getElementById(resultId).textContent = 'まだ実行していません。';
     }
 
@@ -1137,820 +1652,5 @@
         .replaceAll("'", '&#039;');
     }
   </script>
-  <!-- =========================================================
-  追加のみ：送信履歴分析タブ
-  既存HTMLは変更せず、このブロックを </body> の直前に追加してください。
-========================================================= -->
-<script>
-(function () {
-  function escapeHtml(value) {
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
-
-  function getValue(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : '';
-  }
-
-  function getSecretForAnalysis() {
-    const secret = getValue('sendSecret');
-    if (!secret) throw new Error('送信用秘密キーを入力してください。');
-    return secret;
-  }
-
-  function getLogsUrlForAnalysis() {
-    const url = getValue('logsUrl');
-    if (!url) throw new Error('送信履歴 Function URLを入力してください。');
-    return url;
-  }
-
-  async function callLogsFunctionForAnalysis(payload) {
-    const response = await fetch(getLogsUrlForAnalysis(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-send-secret': getSecretForAnalysis()
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data, null, 2));
-    }
-
-    return data;
-  }
-
-  function getDateOnly(value) {
-    if (!value) return '';
-    return String(value).slice(0, 10);
-  }
-
-  function countBy(logs, keyGetter) {
-    const map = new Map();
-
-    for (const log of logs) {
-      const key = keyGetter(log) || '未設定';
-      map.set(key, (map.get(key) || 0) + 1);
-    }
-
-    return Array.from(map.entries())
-      .map(([key, count]) => ({ key, count }))
-      .sort((a, b) => b.count - a.count || String(a.key).localeCompare(String(b.key), 'ja'));
-  }
-
-  function countByTemplateAndStatus(logs) {
-    const map = new Map();
-
-    for (const log of logs) {
-      const template = log.template_key || '未設定';
-      const status = log.status || '未設定';
-      const key = template + '||' + status;
-
-      if (!map.has(key)) {
-        map.set(key, {
-          template_key: template,
-          template_name: log.template_name || '',
-          status,
-          count: 0
-        });
-      }
-
-      map.get(key).count += 1;
-    }
-
-    return Array.from(map.values())
-      .sort((a, b) => String(a.template_key).localeCompare(String(b.template_key), 'ja') || String(a.status).localeCompare(String(b.status), 'ja'));
-  }
-
-  function buildSummary(logs) {
-    const total = logs.length;
-    const sent = logs.filter(log => log.status === 'sent').length;
-    const failed = logs.filter(log => log.status === 'failed').length;
-    const skipped = logs.filter(log => log.status === 'skipped').length;
-    const uniqueEmails = new Set(logs.map(log => log.email).filter(Boolean)).size;
-    const latestSentAt = logs.length ? logs.map(log => log.sent_at).filter(Boolean).sort().reverse()[0] : '';
-
-    return {
-      total,
-      sent,
-      failed,
-      skipped,
-      uniqueEmails,
-      successRate: total ? Math.round((sent / total) * 1000) / 10 : 0,
-      latestSentAt
-    };
-  }
-
-  function renderSummaryCards(summary) {
-    return `
-      <div class="row-3">
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>総履歴数</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.total)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>送信成功</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.sent)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>成功率</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.successRate)}%</span>
-        </div>
-      </div>
-      <div class="row-3">
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>失敗</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.failed)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>スキップ</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.skipped)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>送信先ユニーク数</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.uniqueEmails)}</span>
-        </div>
-      </div>
-      <p class="note">最新送信日時：${escapeHtml(summary.latestSentAt || 'なし')}</p>
-    `;
-  }
-
-  function renderSimpleCountTable(title, rows, keyLabel) {
-    if (!rows.length) {
-      return `<h3>${escapeHtml(title)}</h3><p>データがありません。</p>`;
-    }
-
-    let html = `
-      <h3>${escapeHtml(title)}</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>${escapeHtml(keyLabel)}</th>
-            <th>件数</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    for (const row of rows) {
-      html += `
-        <tr>
-          <td>${escapeHtml(row.key)}</td>
-          <td>${escapeHtml(row.count)}</td>
-        </tr>
-      `;
-    }
-
-    html += '</tbody></table>';
-    return html;
-  }
-
-  function renderTemplateStatusTable(rows) {
-    if (!rows.length) {
-      return '<h3>テンプレート × ステータス</h3><p>データがありません。</p>';
-    }
-
-    let html = `
-      <h3>テンプレート × ステータス</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>テンプレートキー</th>
-            <th>テンプレート名</th>
-            <th>ステータス</th>
-            <th>件数</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    for (const row of rows) {
-      html += `
-        <tr>
-          <td>${escapeHtml(row.template_key)}</td>
-          <td>${escapeHtml(row.template_name)}</td>
-          <td>${escapeHtml(row.status)}</td>
-          <td>${escapeHtml(row.count)}</td>
-        </tr>
-      `;
-    }
-
-    html += '</tbody></table>';
-    return html;
-  }
-
-  function renderTopEmails(logs) {
-    const rows = countBy(logs, log => log.email).slice(0, 30);
-    return renderSimpleCountTable('送信先別 件数 上位30件', rows, 'メールアドレス');
-  }
-
-  function renderRecentLogs(logs) {
-    const recent = logs.slice(0, 30);
-
-    if (!recent.length) {
-      return '<h3>直近履歴</h3><p>データがありません。</p>';
-    }
-
-    let html = `
-      <h3>直近履歴 30件</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>送信日時</th>
-            <th>メール</th>
-            <th>テンプレート</th>
-            <th>ステータス</th>
-            <th>Resend ID</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    for (const log of recent) {
-      html += `
-        <tr>
-          <td>${escapeHtml(log.sent_at || '')}</td>
-          <td>${escapeHtml(log.email || '')}</td>
-          <td>${escapeHtml(log.template_name || log.template_key || '')}</td>
-          <td>${escapeHtml(log.status || '')}</td>
-          <td>${escapeHtml(log.resend_email_id || '')}</td>
-        </tr>
-      `;
-    }
-
-    html += '</tbody></table>';
-    return html;
-  }
-
-  async function loadEmailAnalysis() {
-    const status = document.getElementById('analysisStatus');
-    const result = document.getElementById('analysisResult');
-    const body = document.getElementById('analysisBody');
-
-    status.className = 'status';
-    status.textContent = '送信履歴を分析中です...';
-    result.textContent = '';
-    body.innerHTML = '';
-
-    try {
-      const limit = Number(getValue('analysisLimit') || 200);
-      const templateKey = getValue('analysisTemplateKey');
-      const statusFilter = getValue('analysisStatusFilter');
-      const emailFilter = getValue('analysisEmailFilter');
-
-      const payload = {
-        limit: Math.max(1, Math.min(limit, 200))
-      };
-
-      if (templateKey) payload.template_key = templateKey;
-      if (statusFilter) payload.status = statusFilter;
-      if (emailFilter) payload.email = emailFilter;
-
-      const data = await callLogsFunctionForAnalysis(payload);
-      const logs = Array.isArray(data.logs) ? data.logs : [];
-
-      const summary = buildSummary(logs);
-      const byTemplateStatus = countByTemplateAndStatus(logs);
-      const byDate = countBy(logs, log => getDateOnly(log.sent_at));
-      const byTemplate = countBy(logs, log => log.template_name || log.template_key);
-      const byStatus = countBy(logs, log => log.status);
-
-      status.className = 'status success';
-      status.textContent = `分析完了：${logs.length}件`;
-
-      body.innerHTML =
-        renderSummaryCards(summary) +
-        renderTemplateStatusTable(byTemplateStatus) +
-        renderSimpleCountTable('日別送信履歴', byDate, '日付') +
-        renderSimpleCountTable('テンプレート別履歴', byTemplate, 'テンプレート') +
-        renderSimpleCountTable('ステータス別履歴', byStatus, 'ステータス') +
-        renderTopEmails(logs) +
-        renderRecentLogs(logs);
-
-      result.textContent = JSON.stringify({
-        summary,
-        by_template_status: byTemplateStatus,
-        by_date: byDate,
-        by_template: byTemplate,
-        by_status: byStatus
-      }, null, 2);
-    } catch (error) {
-      status.className = 'status error';
-      status.textContent = 'エラーが発生しました。';
-      result.textContent = error.message;
-    }
-  }
-
-  function clearEmailAnalysis() {
-    document.getElementById('analysisStatus').textContent = '';
-    document.getElementById('analysisBody').innerHTML = '';
-    document.getElementById('analysisResult').textContent = 'まだ実行していません。';
-  }
-
-  function addAnalysisTab() {
-    const tabs = document.querySelector('.tabs');
-    const container = document.querySelector('.container');
-
-    if (!tabs || !container) return;
-    if (document.getElementById('analysisTab')) return;
-
-    const button = document.createElement('button');
-    button.className = 'tab-button';
-    button.textContent = '5. 送信履歴分析';
-
-    button.addEventListener('click', function () {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById('analysisTab').classList.remove('hidden');
-      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-      button.classList.add('active');
-    });
-
-    tabs.appendChild(button);
-
-    const tab = document.createElement('div');
-    tab.id = 'analysisTab';
-    tab.className = 'tab-content hidden';
-
-    tab.innerHTML = `
-      <div class="card">
-        <h2>5. 送信履歴分析</h2>
-
-        <div class="info">
-          email_logs をもとに、送信数・成功率・テンプレート別件数・日別件数を集計します。<br>
-          開封率・クリック率・到達率は、Resend Webhook連携後に分析可能です。
-        </div>
-
-        <div class="row-3">
-          <div>
-            <label for="analysisLimit">分析件数</label>
-            <input id="analysisLimit" type="number" min="1" max="200" value="200" />
-          </div>
-
-          <div>
-            <label for="analysisTemplateKey">テンプレート</label>
-            <select id="analysisTemplateKey">
-              <option value="">すべて</option>
-              <option value="trial_followup">体験後フォロー</option>
-              <option value="campaign">キャンペーン案内</option>
-              <option value="comeback">再検討フォロー</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="analysisStatusFilter">ステータス</label>
-            <select id="analysisStatusFilter">
-              <option value="">すべて</option>
-              <option value="sent">sent</option>
-              <option value="failed">failed</option>
-              <option value="skipped">skipped</option>
-            </select>
-          </div>
-        </div>
-
-        <label for="analysisEmailFilter">メールアドレスで絞り込み</label>
-        <input id="analysisEmailFilter" type="text" placeholder="例：example@gmail.com。空欄ならすべて" />
-
-        <div class="buttons">
-          <button class="btn-blue" onclick="window.loadEmailAnalysis()">分析を実行</button>
-          <button class="btn-gray" onclick="window.clearEmailAnalysis()">結果をクリア</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>分析結果</h3>
-        <div id="analysisStatus" class="status"></div>
-        <div id="analysisBody"></div>
-        <pre id="analysisResult">まだ実行していません。</pre>
-      </div>
-    `;
-
-    container.appendChild(tab);
-  }
-
-  window.loadEmailAnalysis = loadEmailAnalysis;
-  window.clearEmailAnalysis = clearEmailAnalysis;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', addAnalysisTab);
-  } else {
-    addAnalysisTab();
-  }
-})();
-</script>
-<!-- =========================================================
-  追加のみ：送信履歴分析タブを送信日時フィルター版に差し替え
-  既存HTMLは変更せず、このブロックを </body> の直前に追加してください。
-========================================================= -->
-<script>
-(function () {
-  function escapeHtml(value) {
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
-
-  function getValue(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : '';
-  }
-
-  function getSecretForAnalysisV2() {
-    const secret = getValue('sendSecret');
-    if (!secret) throw new Error('送信用秘密キーを入力してください。');
-    return secret;
-  }
-
-  function getLogsUrlForAnalysisV2() {
-    const url = getValue('logsUrl');
-    if (!url) throw new Error('送信履歴 Function URLを入力してください。');
-    return url;
-  }
-
-  async function callLogsFunctionForAnalysisV2(payload) {
-    const response = await fetch(getLogsUrlForAnalysisV2(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-send-secret': getSecretForAnalysisV2()
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data, null, 2));
-    }
-
-    return data;
-  }
-
-  function getDateOnly(value) {
-    if (!value) return '';
-    return String(value).slice(0, 10);
-  }
-
-  function countBy(logs, keyGetter) {
-    const map = new Map();
-
-    for (const log of logs) {
-      const key = keyGetter(log) || '未設定';
-      map.set(key, (map.get(key) || 0) + 1);
-    }
-
-    return Array.from(map.entries())
-      .map(([key, count]) => ({ key, count }))
-      .sort((a, b) => b.count - a.count || String(a.key).localeCompare(String(b.key), 'ja'));
-  }
-
-  function countByTemplateAndStatus(logs) {
-    const map = new Map();
-
-    for (const log of logs) {
-      const template = log.template_key || '未設定';
-      const status = log.status || '未設定';
-      const key = template + '||' + status;
-
-      if (!map.has(key)) {
-        map.set(key, {
-          template_key: template,
-          template_name: log.template_name || '',
-          status,
-          count: 0
-        });
-      }
-
-      map.get(key).count += 1;
-    }
-
-    return Array.from(map.values())
-      .sort((a, b) => String(a.template_key).localeCompare(String(b.template_key), 'ja') || String(a.status).localeCompare(String(b.status), 'ja'));
-  }
-
-  function buildSummary(logs) {
-    const total = logs.length;
-    const sent = logs.filter(log => log.status === 'sent').length;
-    const failed = logs.filter(log => log.status === 'failed').length;
-    const skipped = logs.filter(log => log.status === 'skipped').length;
-    const uniqueEmails = new Set(logs.map(log => log.email).filter(Boolean)).size;
-    const latestSentAt = logs.length ? logs.map(log => log.sent_at).filter(Boolean).sort().reverse()[0] : '';
-
-    return {
-      total,
-      sent,
-      failed,
-      skipped,
-      uniqueEmails,
-      successRate: total ? Math.round((sent / total) * 1000) / 10 : 0,
-      latestSentAt
-    };
-  }
-
-  function renderSummaryCards(summary) {
-    return `
-      <div class="row-3">
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>総履歴数</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.total)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>送信成功</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.sent)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>成功率</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.successRate)}%</span>
-        </div>
-      </div>
-      <div class="row-3">
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>失敗</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.failed)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>スキップ</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.skipped)}</span>
-        </div>
-        <div class="card" style="margin-bottom: 10px;">
-          <strong>送信先ユニーク数</strong><br>
-          <span style="font-size: 24px;">${escapeHtml(summary.uniqueEmails)}</span>
-        </div>
-      </div>
-      <p class="note">最新送信日時：${escapeHtml(summary.latestSentAt || 'なし')}</p>
-    `;
-  }
-
-  function renderSimpleCountTable(title, rows, keyLabel) {
-    if (!rows.length) {
-      return `<h3>${escapeHtml(title)}</h3><p>データがありません。</p>`;
-    }
-
-    let html = `
-      <h3>${escapeHtml(title)}</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>${escapeHtml(keyLabel)}</th>
-            <th>件数</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    for (const row of rows) {
-      html += `
-        <tr>
-          <td>${escapeHtml(row.key)}</td>
-          <td>${escapeHtml(row.count)}</td>
-        </tr>
-      `;
-    }
-
-    html += '</tbody></table>';
-    return html;
-  }
-
-  function renderTemplateStatusTable(rows) {
-    if (!rows.length) {
-      return '<h3>テンプレート × ステータス</h3><p>データがありません。</p>';
-    }
-
-    let html = `
-      <h3>テンプレート × ステータス</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>テンプレートキー</th>
-            <th>テンプレート名</th>
-            <th>ステータス</th>
-            <th>件数</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    for (const row of rows) {
-      html += `
-        <tr>
-          <td>${escapeHtml(row.template_key)}</td>
-          <td>${escapeHtml(row.template_name)}</td>
-          <td>${escapeHtml(row.status)}</td>
-          <td>${escapeHtml(row.count)}</td>
-        </tr>
-      `;
-    }
-
-    html += '</tbody></table>';
-    return html;
-  }
-
-  function renderTopEmails(logs) {
-    const rows = countBy(logs, log => log.email).slice(0, 30);
-    return renderSimpleCountTable('送信先別 件数 上位30件', rows, 'メールアドレス');
-  }
-
-  function renderRecentLogs(logs) {
-    const recent = logs.slice(0, 30);
-
-    if (!recent.length) {
-      return '<h3>直近履歴</h3><p>データがありません。</p>';
-    }
-
-    let html = `
-      <h3>直近履歴 30件</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>送信日時</th>
-            <th>メール</th>
-            <th>テンプレート</th>
-            <th>ステータス</th>
-            <th>Resend ID</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    for (const log of recent) {
-      html += `
-        <tr>
-          <td>${escapeHtml(log.sent_at || '')}</td>
-          <td>${escapeHtml(log.email || '')}</td>
-          <td>${escapeHtml(log.template_name || log.template_key || '')}</td>
-          <td>${escapeHtml(log.status || '')}</td>
-          <td>${escapeHtml(log.resend_email_id || '')}</td>
-        </tr>
-      `;
-    }
-
-    html += '</tbody></table>';
-    return html;
-  }
-
-  async function loadEmailAnalysisV2() {
-    const status = document.getElementById('analysisStatus');
-    const result = document.getElementById('analysisResult');
-    const body = document.getElementById('analysisBody');
-
-    status.className = 'status';
-    status.textContent = '送信履歴を分析中です...';
-    result.textContent = '';
-    body.innerHTML = '';
-
-    try {
-      const dateFrom = getValue('analysisDateFrom');
-      const dateTo = getValue('analysisDateTo');
-      const templateKey = getValue('analysisTemplateKey');
-      const statusFilter = getValue('analysisStatusFilter');
-      const emailFilter = getValue('analysisEmailFilter');
-
-      const payload = {
-        limit: 1000
-      };
-
-      if (dateFrom) payload.date_from = dateFrom;
-      if (dateTo) payload.date_to = dateTo;
-      if (templateKey) payload.template_key = templateKey;
-      if (statusFilter) payload.status = statusFilter;
-      if (emailFilter) payload.email = emailFilter;
-
-      const data = await callLogsFunctionForAnalysisV2(payload);
-      const logs = Array.isArray(data.logs) ? data.logs : [];
-
-      const summary = buildSummary(logs);
-      const byTemplateStatus = countByTemplateAndStatus(logs);
-      const byDate = countBy(logs, log => getDateOnly(log.sent_at));
-      const byTemplate = countBy(logs, log => log.template_name || log.template_key);
-      const byStatus = countBy(logs, log => log.status);
-
-      status.className = 'status success';
-      status.textContent = `分析完了：${logs.length}件`;
-
-      body.innerHTML =
-        renderSummaryCards(summary) +
-        renderTemplateStatusTable(byTemplateStatus) +
-        renderSimpleCountTable('日別送信履歴', byDate, '日付') +
-        renderSimpleCountTable('テンプレート別履歴', byTemplate, 'テンプレート') +
-        renderSimpleCountTable('ステータス別履歴', byStatus, 'ステータス') +
-        renderTopEmails(logs) +
-        renderRecentLogs(logs);
-
-      result.textContent = JSON.stringify({
-        filters: {
-          date_from: dateFrom || null,
-          date_to: dateTo || null,
-          template_key: templateKey || null,
-          status: statusFilter || null,
-          email: emailFilter || null
-        },
-        summary,
-        by_template_status: byTemplateStatus,
-        by_date: byDate,
-        by_template: byTemplate,
-        by_status: byStatus
-      }, null, 2);
-    } catch (error) {
-      status.className = 'status error';
-      status.textContent = 'エラーが発生しました。';
-      result.textContent = error.message;
-    }
-  }
-
-  function clearEmailAnalysisV2() {
-    document.getElementById('analysisStatus').textContent = '';
-    document.getElementById('analysisBody').innerHTML = '';
-    document.getElementById('analysisResult').textContent = 'まだ実行していません。';
-  }
-
-  function replaceAnalysisTabContent() {
-    const tab = document.getElementById('analysisTab');
-
-    if (!tab) {
-      setTimeout(replaceAnalysisTabContent, 300);
-      return;
-    }
-
-    tab.innerHTML = `
-      <div class="card">
-        <h2>5. 送信履歴分析</h2>
-
-        <div class="info">
-          email_logs をもとに、送信数・成功率・テンプレート別件数・日別件数を集計します。<br>
-          送信日時で期間指定できます。開封率・クリック率・到達率は、Resend Webhook連携後に分析可能です。
-        </div>
-
-        <div class="row">
-          <div>
-            <label for="analysisDateFrom">送信日時 開始日</label>
-            <input id="analysisDateFrom" type="date" />
-          </div>
-
-          <div>
-            <label for="analysisDateTo">送信日時 終了日</label>
-            <input id="analysisDateTo" type="date" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div>
-            <label for="analysisTemplateKey">テンプレート</label>
-            <select id="analysisTemplateKey">
-              <option value="">すべて</option>
-              <option value="trial_followup">体験後フォロー</option>
-              <option value="campaign">キャンペーン案内</option>
-              <option value="comeback">再検討フォロー</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="analysisStatusFilter">ステータス</label>
-            <select id="analysisStatusFilter">
-              <option value="">すべて</option>
-              <option value="sent">sent</option>
-              <option value="failed">failed</option>
-              <option value="skipped">skipped</option>
-            </select>
-          </div>
-        </div>
-
-        <label for="analysisEmailFilter">メールアドレスで絞り込み</label>
-        <input id="analysisEmailFilter" type="text" placeholder="例：example@gmail.com。空欄ならすべて" />
-
-        <div class="buttons">
-          <button class="btn-blue" onclick="window.loadEmailAnalysis()">分析を実行</button>
-          <button class="btn-gray" onclick="window.clearEmailAnalysis()">結果をクリア</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>分析結果</h3>
-        <div id="analysisStatus" class="status"></div>
-        <div id="analysisBody"></div>
-        <pre id="analysisResult">まだ実行していません。</pre>
-      </div>
-    `;
-  }
-
-  window.loadEmailAnalysis = loadEmailAnalysisV2;
-  window.clearEmailAnalysis = clearEmailAnalysisV2;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', replaceAnalysisTabContent);
-  } else {
-    replaceAnalysisTabContent();
-  }
-})();
-</script>  
 </body>
 </html>
