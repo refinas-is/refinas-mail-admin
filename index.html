@@ -292,11 +292,18 @@
 
         <p class="note">
           CSVまたはタブ区切りで貼り付けてください。1行目はヘッダー必須です。<br>
-          必須列：name, email / 任意列：store_name, trial_date, joined, can_send, notes<br>
-          trial_date は YYYY-MM-DD 形式にしてください。
+          「リフィナス元CSV形式」を選ぶと、以下の列名から自動変換します。<br>
+          登録店舗 → store_name / 名前 → name / メールアドレス1 → email / 会員登録日 → trial_date / 会員登録区分 → joined<br>
+          ステータス列は取り込みません。
         </p>
 
-        <textarea id="importText" placeholder="name,email,store_name,trial_date,joined,can_send,notes&#10;山田太郎,test@example.com,渋谷本店,2026-05-20,false,true,メモ"></textarea>
+        <label for="csvFormat">CSV形式</label>
+        <select id="csvFormat">
+          <option value="refinas">リフィナス元CSV形式</option>
+          <option value="standard">標準形式：name,email,store_name,trial_date,joined,can_send,notes</option>
+        </select>
+
+        <textarea id="importText" placeholder="登録店舗,名前(カナ),名前,郵便番号,都道府県,市区町村,丁目・番地,電話番号,メールアドレス1,生年月日,性別,会員登録日,ステータス,年齢,職業,初回来店動機,会員登録区分,会員種別,コース&#10;渋谷本店,ヤマダタロウ,山田太郎,0000000,東京都,渋谷区,xxx,09000000000,test@example.com,1990-01-01,男性,2026-05-20,通常,30,会社員,Web,未入会,体験,通常"></textarea>
 
         <div class="row">
           <div>
@@ -402,7 +409,7 @@
         <div class="row">
           <div>
             <label for="replyEmail">返信先メールアドレス</label>
-            <input id="replyEmail" type="text" placeholder="空欄なら refinasfitnessstudio@gmail.com" />
+            <input id="replyEmail" type="text" placeholder="空欄なら info@refinas.jp" />
           </div>
           <div>
             <label for="sendSubject">件名上書き</label>
@@ -589,9 +596,62 @@
       return defaultValue;
     }
 
+    function normalizeDate(value) {
+      if (value === undefined || value === null || String(value).trim() === '') return null;
+
+      const raw = String(value).trim();
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+      const slashMatch = raw.match(/^(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})$/);
+      if (slashMatch) {
+        const y = slashMatch[1];
+        const m = slashMatch[2].padStart(2, '0');
+        const d = slashMatch[3].padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      const compactMatch = raw.match(/^(\d{4})(\d{2})(\d{2})$/);
+      if (compactMatch) {
+        return `${compactMatch[1]}-${compactMatch[2]}-${compactMatch[3]}`;
+      }
+
+      const jpMatch = raw.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+      if (jpMatch) {
+        const y = jpMatch[1];
+        const m = jpMatch[2].padStart(2, '0');
+        const d = jpMatch[3].padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      throw new Error(`日付形式を変換できません：${raw}。YYYY-MM-DD、YYYY/MM/DD、YYYYMMDD のいずれかにしてください。`);
+    }
+
+    function parseJoinedFromMemberRegistrationType(value) {
+      const v = String(value || '').trim();
+
+      if (!v) return false;
+
+      if (
+        v.includes('入会') &&
+        !v.includes('未入会') &&
+        !v.includes('非入会') &&
+        !v.includes('体験')
+      ) {
+        return true;
+      }
+
+      if (['本会員', '会員', '成約', '契約済み', '入会済み'].includes(v)) {
+        return true;
+      }
+
+      return false;
+    }
+
     function parseImportText() {
       const text = document.getElementById('importText').value.trim();
       const defaultCanSend = document.getElementById('defaultCanSend').value === 'true';
+      const csvFormat = document.getElementById('csvFormat') ? document.getElementById('csvFormat').value : 'standard';
 
       if (!text) throw new Error('取込データを入力してください。');
 
@@ -601,30 +661,65 @@
       const delimiter = lines[0].includes('\t') ? '\t' : ',';
       const headers = parseCsvLine(lines[0], delimiter).map(h => h.trim());
 
-      for (const required of ['name', 'email']) {
-        if (!headers.includes(required)) throw new Error(`必須列 ${required} がありません。`);
-      }
-
       const records = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const values = parseCsvLine(lines[i], delimiter);
-        const row = {};
-        headers.forEach((header, index) => {
-          row[header] = (values[index] || '').trim();
-        });
+      if (csvFormat === 'standard') {
+        for (const required of ['name', 'email']) {
+          if (!headers.includes(required)) throw new Error(`必須列 ${required} がありません。`);
+        }
 
-        if (!row.name || !row.email) continue;
+        for (let i = 1; i < lines.length; i++) {
+          const values = parseCsvLine(lines[i], delimiter);
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = (values[index] || '').trim();
+          });
 
-        records.push({
-          name: row.name,
-          email: row.email,
-          store_name: row.store_name || null,
-          trial_date: row.trial_date || null,
-          joined: parseBoolean(row.joined, false),
-          can_send: parseBoolean(row.can_send, defaultCanSend),
-          notes: row.notes || null
-        });
+          if (!row.name || !row.email) continue;
+
+          records.push({
+            name: row.name,
+            email: row.email,
+            store_name: row.store_name || null,
+            trial_date: normalizeDate(row.trial_date),
+            joined: parseBoolean(row.joined, false),
+            can_send: parseBoolean(row.can_send, defaultCanSend),
+            notes: row.notes || null
+          });
+        }
+      } else {
+        const requiredOriginalHeaders = ['登録店舗', '名前', 'メールアドレス1', '会員登録日', '会員登録区分'];
+
+        for (const required of requiredOriginalHeaders) {
+          if (!headers.includes(required)) {
+            throw new Error(`リフィナス元CSV形式に必要な列 ${required} がありません。`);
+          }
+        }
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = parseCsvLine(lines[i], delimiter);
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = (values[index] || '').trim();
+          });
+
+          const name = row['名前'];
+          const email = row['メールアドレス1'];
+
+          if (!name || !email) continue;
+
+          const memberRegistrationType = row['会員登録区分'] || '';
+
+          records.push({
+            name: name,
+            email: email,
+            store_name: row['登録店舗'] || null,
+            trial_date: normalizeDate(row['会員登録日']),
+            joined: parseJoinedFromMemberRegistrationType(memberRegistrationType),
+            can_send: defaultCanSend,
+            notes: memberRegistrationType ? `会員登録区分:${memberRegistrationType}` : null
+          });
+        }
       }
 
       if (!records.length) throw new Error('取込対象のデータがありません。');
