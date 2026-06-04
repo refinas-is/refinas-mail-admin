@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>リフィナス メール送信管理</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f4f4f4;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+      color: #222;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 16px 60px;
+    }
+
+    .header {
+      background: #111;
+      color: #fff;
+      padding: 24px;
+      border-top: 6px solid #d71920;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: #ddd;
+      font-size: 13px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 24px;
+      border: 1px solid #e5e5e5;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    button {
+      border: none;
+      padding: 14px 22px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-preview {
+      background: #005bac;
+      color: #fff;
+    }
+
+    .btn-send {
+      background: #d71920;
+      color: #fff;
+    }
+
+    .btn-clear {
+      background: #ddd;
+      color: #222;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .warning {
+      background: #fff3f3;
+      border-left: 4px solid #d71920;
+      padding: 14px 16px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    pre {
+      background: #111;
+      color: #eee;
+      padding: 16px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 80px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f2f2f2;
+    }
+
+    .status {
+      font-weight: bold;
+      margin-top: 16px;
+    }
+
+    .success {
+      color: #005bac;
+    }
+
+    .error {
+      color: #d71920;
+    }
+
+    @media (max-width: 700px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <h1>リフィナス メール送信管理</h1>
+      <p>対象者確認 → 本送信の順番で実行してください。</p>
+    </div>
+
+    <div class="card">
+      <div class="warning">
+        本送信を押すと実際にメールが送信されます。必ず先に「対象者を確認」を実行してください。<br>
+        送信用秘密キーは画面内で入力するだけで、HTMLには保存していません。
+      </div>
+
+      <label for="functionUrl">Edge Function URL</label>
+      <input
+        id="functionUrl"
+        type="text"
+        placeholder="https://xxxx.supabase.co/functions/v1/send-bulk-trial-followup"
+      />
+
+      <label for="sendSecret">送信用秘密キー</label>
+      <input
+        id="sendSecret"
+        type="password"
+        placeholder="Supabase Secrets の SEND_EMAIL_SECRET"
+      />
+
+      <div class="row">
+        <div>
+          <label for="templateKey">テンプレート</label>
+          <select id="templateKey">
+            <option value="trial_followup">体験後フォロー</option>
+            <option value="campaign">キャンペーン案内</option>
+            <option value="comeback">再検討フォロー</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="limit">送信上限</label>
+          <input id="limit" type="number" value="50" min="1" max="100" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="dateFrom">対象開始日</label>
+          <input id="dateFrom" type="date" />
+        </div>
+
+        <div>
+          <label for="dateTo">対象終了日</label>
+          <input id="dateTo" type="date" />
+        </div>
+      </div>
+
+      <label for="storeName">店舗名で絞り込み</label>
+      <input id="storeName" type="text" placeholder="例：渋谷本店。空欄なら全店舗" />
+
+      <p class="note">
+        対象開始日・終了日を空欄にすると、Edge Function側で「先月」が自動指定されます。
+      </p>
+
+      <div class="buttons">
+        <button id="previewButton" class="btn-preview" onclick="previewTargets()">対象者を確認</button>
+        <button id="sendButton" class="btn-send" onclick="sendEmails()">本送信</button>
+        <button class="btn-clear" onclick="clearResult()">結果をクリア</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>実行結果</h2>
+      <div id="status" class="status"></div>
+      <div id="targetTable"></div>
+      <pre id="result">まだ実行していません。</pre>
+    </div>
+
+  </div>
+
+  <script>
+    function getPayload(isSend) {
+      const templateKey = document.getElementById('templateKey').value;
+      const limit = Number(document.getElementById('limit').value || 50);
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+      const storeName = document.getElementById('storeName').value.trim();
+
+      const payload = {
+        template_key: templateKey,
+        limit: limit
+      };
+
+      if (dateFrom) payload.date_from = dateFrom;
+      if (dateTo) payload.date_to = dateTo;
+      if (storeName) payload.store_name = storeName;
+
+      if (isSend) {
+        payload.dry_run = false;
+        payload.confirm_send = true;
+      } else {
+        payload.dry_run = true;
+      }
+
+      return payload;
+    }
+
+    async function callFunction(payload) {
+      const functionUrl = document.getElementById('functionUrl').value.trim();
+      const sendSecret = document.getElementById('sendSecret').value.trim();
+
+      if (!functionUrl) {
+        throw new Error('Edge Function URLを入力してください。');
+      }
+
+      if (!sendSecret) {
+        throw new Error('送信用秘密キーを入力してください。');
+      }
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-send-secret': sendSecret
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data, null, 2));
+      }
+
+      return data;
+    }
+
+    function setLoading(isLoading) {
+      document.getElementById('previewButton').disabled = isLoading;
+      document.getElementById('sendButton').disabled = isLoading;
+    }
+
+    async function previewTargets() {
+      clearDisplayOnly();
+      setLoading(true);
+
+      const status = document.getElementById('status');
+      const result = document.getElementById('result');
+
+      try {
+        status.className = 'status';
+        status.textContent = '対象者を確認中です...';
+
+        const payload = getPayload(false);
+        const data = await callFunction(payload);
+
+        status.className = 'status success';
+        status.textContent = `対象者確認完了：${data.target_count || 0}件`;
+
+        renderTargets(data.targets || []);
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = 'エラーが発生しました。';
+        result.textContent = error.message;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function sendEmails() {
+      clearDisplayOnly();
+
+      const ok = confirm(
+        '本当に送信しますか？\n\n先に対象者確認を行い、対象者が正しいことを確認してから実行してください。'
+      );
+
+      if (!ok) return;
+
+      const secondOk = confirm(
+        '最終確認です。\n\nこの操作で実際にメールが送信されます。実行しますか？'
+      );
+
+      if (!secondOk) return;
+
+      setLoading(true);
+
+      const status = document.getElementById('status');
+      const result = document.getElementById('result');
+
+      try {
+        status.className = 'status';
+        status.textContent = 'メールを送信中です...';
+
+        const payload = getPayload(true);
+        const data = await callFunction(payload);
+
+        status.className = 'status success';
+        status.textContent =
+          `送信完了：成功 ${data.sent_count || 0}件 / 失敗 ${data.failed_count || 0}件 / スキップ ${data.skipped_count || 0}件`;
+
+        renderResults(data.results || []);
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = 'エラーが発生しました。';
+        result.textContent = error.message;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function renderTargets(targets) {
+      const targetTable = document.getElementById('targetTable');
+
+      if (!targets.length) {
+        targetTable.innerHTML = '<p>対象者はいません。</p>';
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>メール</th>
+              <th>店舗</th>
+              <th>体験日</th>
+              <th>送信済み</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const user of targets) {
+        html += `
+          <tr>
+            <td>${escapeHtml(user.name || '')}</td>
+            <td>${escapeHtml(user.email || '')}</td>
+            <td>${escapeHtml(user.store_name || '')}</td>
+            <td>${escapeHtml(user.trial_date || '')}</td>
+            <td>${escapeHtml(user.sent_at || '未送信')}</td>
+          </tr>
+        `;
+      }
+
+      html += `
+          </tbody>
+        </table>
+      `;
+
+      targetTable.innerHTML = html;
+    }
+
+    function renderResults(results) {
+      const targetTable = document.getElementById('targetTable');
+
+      if (!results.length) {
+        targetTable.innerHTML = '<p>送信結果はありません。</p>';
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>メール</th>
+              <th>店舗</th>
+              <th>結果</th>
+              <th>Resend ID</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const item of results) {
+        html += `
+          <tr>
+            <td>${escapeHtml(item.name || '')}</td>
+            <td>${escapeHtml(item.email || '')}</td>
+            <td>${escapeHtml(item.store_name || '')}</td>
+            <td>${escapeHtml(item.status || '')}</td>
+            <td>${escapeHtml(item.resend_email_id || '')}</td>
+          </tr>
+        `;
+      }
+
+      html += `
+          </tbody>
+        </table>
+      `;
+
+      targetTable.innerHTML = html;
+    }
+
+    function clearDisplayOnly() {
+      document.getElementById('status').textContent = '';
+      document.getElementById('targetTable').innerHTML = '';
+      document.getElementById('result').textContent = '';
+    }
+
+    function clearResult() {
+      document.getElementById('status').textContent = '';
+      document.getElementById('targetTable').innerHTML = '';
+      document.getElementById('result').textContent = 'まだ実行していません。';
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>
