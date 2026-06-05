@@ -547,6 +547,9 @@
         <label for="listTypesUrl">リスト種別取得 Function URL</label>
         <input id="listTypesUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/get-list-types" />
 
+        <label for="churnReasonsUrl">退会理由取得 Function URL</label>
+        <input id="churnReasonsUrl" type="text" placeholder="https://xxxx.supabase.co/functions/v1/get-churn-reasons" />
+
         <div class="buttons">
           <button class="btn-gray" onclick="saveSettings()">URLをこのブラウザに保存</button>
           <button class="btn-gray" onclick="clearSettings()">保存URLを削除</button>
@@ -609,6 +612,7 @@
         <label for="csvFormat">CSV形式</label>
         <select id="csvFormat">
           <option value="refinas">リフィナス元CSV形式</option>
+          <option value="churned">退会者CSV形式</option>
           <option value="standard">標準形式：name,email,store_name,trial_date,joined,can_send,notes</option>
         </select>
 
@@ -620,7 +624,7 @@
 
         <textarea
           id="importText"
-          placeholder="登録店舗,名前(カナ),名前,郵便番号,都道府県,市区町村,丁目・番地,電話番号,メールアドレス1,生年月日,性別,会員登録日,ステータス,年齢,職業,初回来店動機,会員登録区分,会員種別,コース&#10;渋谷本店,ヤマダタロウ,山田太郎,0000000,東京都,渋谷区,xxx,09000000000,test@example.com,1990-01-01,男性,2026-05-20,通常,30,会社員,Web,未入会,体験,通常"
+          placeholder="リフィナス元CSV例：登録店舗,名前,メールアドレス1,会員登録日,会員登録区分&#10;渋谷本店,山田太郎,test@example.com,2026-05-20,未入会&#10;&#10;退会者CSV例：メールアドレス,姓（漢字）,名（漢字）,姓（ふりがな）,名（ふりがな）,お電話番号,トレーニング最終月,ご退会理由&#10;test@example.com,山田,太郎,やまだ,たろう,09000000000,2026-05,通う時間がない"
         ></textarea>
 
         <div class="row">
@@ -704,6 +708,20 @@
 
         <label for="storeName">店舗名で絞り込み</label>
         <input id="storeName" type="text" placeholder="例：渋谷本店。空欄なら全店舗" />
+
+        <div class="row">
+          <div>
+            <label for="churnReasonFilter">退会理由で絞り込み</label>
+            <select id="churnReasonFilter">
+              <option value="">すべて</option>
+            </select>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="button" class="btn-blue" onclick="loadChurnReasons()">退会理由を読み込み</button>
+          </div>
+        </div>
+        <p class="note">退会済みリストで使う項目です。空欄なら退会理由で絞り込まず、対象リスト全体から作成します。</p>
 
         <label for="batchNotes">メモ</label>
         <input id="batchNotes" type="text" placeholder="例：2026年5月分 体験後フォロー" />
@@ -883,13 +901,76 @@
       }
     }
 
+
+    async function loadChurnReasons() {
+      const status = document.getElementById('batchStatus') || document.getElementById('importStatus');
+
+      try {
+        const url = getUrl('churnReasonsUrl', '退会理由取得 Function URL');
+        const listTypeKey = document.getElementById('batchListTypeKey')
+          ? document.getElementById('batchListTypeKey').value
+          : 'churned';
+
+        if (status) {
+          status.className = 'status';
+          status.textContent = '退会理由を読み込み中です...';
+        }
+
+        const data = await callFunction(url, {
+          list_type_key: listTypeKey || 'churned'
+        });
+
+        const reasons = Array.isArray(data.churn_reasons) ? data.churn_reasons : [];
+        updateChurnReasonSelect(reasons);
+
+        if (status) {
+          status.className = 'status success';
+          status.textContent = `退会理由を読み込みました：${reasons.length}件`;
+        }
+
+        return reasons;
+      } catch (error) {
+        if (status) {
+          status.className = 'status error';
+          status.textContent = '退会理由の読み込みに失敗しました。';
+        }
+        alert(error.message);
+        return [];
+      }
+    }
+
+    function updateChurnReasonSelect(reasons) {
+      const select = document.getElementById('churnReasonFilter');
+      if (!select) return;
+
+      const currentValue = select.value;
+      select.innerHTML = '';
+
+      const allOption = document.createElement('option');
+      allOption.value = '';
+      allOption.textContent = 'すべて';
+      select.appendChild(allOption);
+
+      for (const item of reasons) {
+        const option = document.createElement('option');
+        option.value = item.churn_reason;
+        option.textContent = `${item.churn_reason}（${item.count}件）`;
+        select.appendChild(option);
+      }
+
+      if ([...select.options].some(option => option.value === currentValue)) {
+        select.value = currentValue;
+      }
+    }
+
     function saveSettings() {
       const data = {
         importUrl: document.getElementById('importUrl').value.trim(),
         createBatchUrl: document.getElementById('createBatchUrl').value.trim(),
         sendBatchUrl: document.getElementById('sendBatchUrl').value.trim(),
         logsUrl: document.getElementById('logsUrl').value.trim(),
-        listTypesUrl: document.getElementById('listTypesUrl') ? document.getElementById('listTypesUrl').value.trim() : ''
+        listTypesUrl: document.getElementById('listTypesUrl') ? document.getElementById('listTypesUrl').value.trim() : '',
+        churnReasonsUrl: document.getElementById('churnReasonsUrl') ? document.getElementById('churnReasonsUrl').value.trim() : ''
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -908,6 +989,9 @@
         document.getElementById('logsUrl').value = data.logsUrl || '';
         if (document.getElementById('listTypesUrl')) {
           document.getElementById('listTypesUrl').value = data.listTypesUrl || '';
+        }
+        if (document.getElementById('churnReasonsUrl')) {
+          document.getElementById('churnReasonsUrl').value = data.churnReasonsUrl || '';
         }
       } catch (_) {}
     }
@@ -1084,6 +1168,37 @@
       throw new Error(`日付形式を変換できません：${raw}。YYYY-MM-DD、YYYY/MM/DD、YYYYMMDD のいずれかにしてください。`);
     }
 
+
+    function normalizeMonthToDate(value) {
+      if (value === undefined || value === null || String(value).trim() === '') return null;
+
+      const raw = String(value).trim();
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+      const ymHyphen = raw.match(/^(\d{4})-(\d{1,2})$/);
+      if (ymHyphen) {
+        return `${ymHyphen[1]}-${ymHyphen[2].padStart(2, '0')}-01`;
+      }
+
+      const ymSlash = raw.match(/^(\d{4})[\/.](\d{1,2})$/);
+      if (ymSlash) {
+        return `${ymSlash[1]}-${ymSlash[2].padStart(2, '0')}-01`;
+      }
+
+      const ymCompact = raw.match(/^(\d{4})(\d{2})$/);
+      if (ymCompact) {
+        return `${ymCompact[1]}-${ymCompact[2]}-01`;
+      }
+
+      const ymJp = raw.match(/^(\d{4})年(\d{1,2})月$/);
+      if (ymJp) {
+        return `${ymJp[1]}-${ymJp[2].padStart(2, '0')}-01`;
+      }
+
+      return normalizeDate(raw);
+    }
+
     function parseJoinedFromMemberRegistrationType(value) {
       const v = String(value || '').trim();
 
@@ -1123,9 +1238,15 @@
         return h.trim();
       });
 
-      const records = csvFormat === 'standard'
-        ? parseStandardRecords(lines, headers, delimiter, defaultCanSend)
-        : parseRefinasRecords(lines, headers, delimiter, defaultCanSend);
+      let records;
+
+      if (csvFormat === 'standard') {
+        records = parseStandardRecords(lines, headers, delimiter, defaultCanSend);
+      } else if (csvFormat === 'churned') {
+        records = parseChurnedRecords(lines, headers, delimiter, defaultCanSend);
+      } else {
+        records = parseRefinasRecords(lines, headers, delimiter, defaultCanSend);
+      }
 
       if (!records.length) throw new Error('取込対象のデータがありません。');
 
@@ -1193,6 +1314,44 @@
       return records;
     }
 
+
+    function parseChurnedRecords(lines, headers, delimiter, defaultCanSend) {
+      const requiredHeaders = ['メールアドレス', '姓（漢字）', '名（漢字）', 'トレーニング最終月', 'ご退会理由'];
+
+      for (const required of requiredHeaders) {
+        if (!headers.includes(required)) {
+          throw new Error(`退会者CSV形式に必要な列 ${required} がありません。`);
+        }
+      }
+
+      const records = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = buildRowObject(lines[i], headers, delimiter);
+
+        const email = row['メールアドレス'];
+        const lastName = row['姓（漢字）'] || '';
+        const firstName = row['名（漢字）'] || '';
+        const name = `${lastName} ${firstName}`.trim();
+        const churnReason = row['ご退会理由'] || '';
+
+        if (!name || !email) continue;
+
+        records.push({
+          name,
+          email,
+          store_name: null,
+          trial_date: normalizeMonthToDate(row['トレーニング最終月']),
+          joined: false,
+          can_send: defaultCanSend,
+          notes: churnReason ? `退会理由:${churnReason}` : null,
+          churn_reason: churnReason || null
+        });
+      }
+
+      return records;
+    }
+
     function buildRowObject(line, headers, delimiter) {
       const values = parseCsvLine(line, delimiter);
       const row = {};
@@ -1253,9 +1412,15 @@
           ? document.getElementById('newListTypeKey').value.trim()
           : '';
 
+        const csvFormat = document.getElementById('csvFormat')
+          ? document.getElementById('csvFormat').value
+          : 'standard';
+
         if (newListTypeName) {
           payload.new_list_type_name = newListTypeName;
           if (newListTypeKey) payload.new_list_type_key = newListTypeKey;
+        } else if (csvFormat === 'churned') {
+          payload.list_type_key = 'churned';
         } else {
           payload.list_type_key = document.getElementById('importListTypeKey')
             ? document.getElementById('importListTypeKey').value
@@ -1303,9 +1468,14 @@
         const storeName = document.getElementById('storeName').value.trim();
         const notes = document.getElementById('batchNotes').value.trim();
 
+        const churnReason = document.getElementById('churnReasonFilter')
+          ? document.getElementById('churnReasonFilter').value
+          : '';
+
         if (dateFrom) payload.date_from = dateFrom;
         if (dateTo) payload.date_to = dateTo;
         if (storeName) payload.store_name = storeName;
+        if (churnReason) payload.churn_reason = churnReason;
         if (notes) payload.notes = notes;
 
         status.className = 'status';
@@ -1321,7 +1491,7 @@
         status.className = 'status success';
         status.textContent = data.mode === 'no_targets'
           ? '対象者はいません。'
-          : `バッチ作成完了：${data.batch.target_count}件 / リスト：${data.batch.list_type_name || '-'} / 確認文言：${data.batch.confirm_text}`;
+          : `バッチ作成完了：${data.batch.target_count}件 / リスト：${data.batch.list_type_name || '-'}${data.batch.churn_reason ? ' / 退会理由：' + data.batch.churn_reason : ''} / 確認文言：${data.batch.confirm_text}`;
 
         renderBatchTargets(data.targets || [], 'batchTable');
         result.textContent = JSON.stringify(data, null, 2);
@@ -1406,7 +1576,7 @@
         return;
       }
 
-      let html = '<table><thead><tr><th>名前</th><th>メール</th><th>店舗</th><th>体験日</th><th>入会済み</th><th>送信OK</th><th>メモ</th></tr></thead><tbody>';
+      let html = '<table><thead><tr><th>名前</th><th>メール</th><th>店舗</th><th>対象日</th><th>入会済み</th><th>送信OK</th><th>退会理由</th><th>メモ</th></tr></thead><tbody>';
 
       for (const row of records) {
         html += `<tr>
@@ -1416,6 +1586,7 @@
           <td>${escapeHtml(row.trial_date || '')}</td>
           <td>${escapeHtml(row.joined)}</td>
           <td>${escapeHtml(row.can_send)}</td>
+          <td>${escapeHtml(row.churn_reason || '')}</td>
           <td>${escapeHtml(row.notes || '')}</td>
         </tr>`;
       }
