@@ -1238,17 +1238,21 @@
         const testEmail = document.getElementById('testEmail').value.trim();
         if (!testEmail) throw new Error('テスト送信先メールアドレスを入力してください。');
         const url = getUrl('sendTestUrl', 'テスト送信 Function URL');
+        const sample = state.checkedRecords[0] || state.rawRecords[0] || {
+          name: 'テスト太郎',
+          email: testEmail,
+          store_name: 'リフィナス',
+        };
+
         const payload = {
-          to: testEmail,
+          test_email: testEmail,
           template_key: state.selectedTemplate.template_key,
+          name: sample.name || 'テスト様',
+          store_name: sample.store_name || sample.store || 'リフィナス',
           reply_email: document.getElementById('replyEmail').value.trim(),
           subject: document.getElementById('subjectOverride').value.trim() || undefined,
           campaign_text: document.getElementById('campaignText').value.trim() || '',
-          sample: state.checkedRecords[0] || state.rawRecords[0] || {
-            name: 'テスト太郎',
-            email: testEmail,
-            store_name: 'リフィナス',
-          },
+          sample,
         };
         const data = await callFunction(url, payload);
         document.getElementById('testResult').textContent = JSON.stringify(data, null, 2);
