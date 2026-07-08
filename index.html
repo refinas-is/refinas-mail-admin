@@ -3,1795 +3,1303 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Refinas Mail</title>
+  <title>REFINAS Mail 管理画面</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #050505;
-      --panel: #0a0a0a;
-      --card: #111111;
-      --card-2: #151515;
-      --border: #262626;
-      --border-soft: #1f1f1f;
-      --text: #fafafa;
-      --muted: #a3a3a3;
-      --muted-2: #737373;
-      --white: #ffffff;
-      --black: #000000;
-      --green: #22c55e;
-      --yellow: #eab308;
-      --red: #ef4444;
-      --blue: #60a5fa;
+      --bg: #f7f7f8;
+      --panel: #ffffff;
+      --text: #101114;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --border-dark: #d1d5db;
+      --black: #111111;
+      --black-hover: #2a2a2a;
+      --danger: #b42318;
+      --danger-bg: #fff1f0;
+      --ok: #067647;
+      --ok-bg: #ecfdf3;
+      --warn: #b54708;
+      --warn-bg: #fffaeb;
       --radius: 16px;
-      --shadow: 0 20px 80px rgba(0,0,0,.35);
-      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --shadow: 0 20px 60px rgba(16, 17, 20, 0.08);
     }
 
     * { box-sizing: border-box; }
 
-    html, body { min-height: 100%; }
-
     body {
       margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+      background: var(--bg);
       color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.08), transparent 28%),
-        radial-gradient(circle at 80% 10%, rgba(96,165,250,.12), transparent 22%),
-        var(--bg);
-      font-family: var(--font);
-      letter-spacing: .01em;
-    }
-
-    button, input, select, textarea { font: inherit; }
-
-    .app {
-      width: min(1440px, 100%);
-      margin: 0 auto;
-      padding: 28px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 22px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: var(--white);
-      color: var(--black);
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      letter-spacing: -.04em;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: -.03em;
-    }
-
-    .sub {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 13px;
       line-height: 1.6;
     }
 
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+    button, input, textarea, select {
+      font: inherit;
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--green);
-      box-shadow: 0 0 0 4px rgba(34,197,94,.12);
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 280px minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 18px;
-      background: rgba(10,10,10,.72);
-      backdrop-filter: blur(14px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px;
-      box-shadow: var(--shadow);
-    }
-
-    .step-btn {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 28px 1fr auto;
-      gap: 10px;
-      align-items: center;
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--muted);
-      border-radius: 12px;
-      padding: 11px 10px;
+    button {
       cursor: pointer;
-      text-align: left;
-    }
-
-    .step-btn:hover { background: rgba(255,255,255,.04); }
-
-    .step-btn.active {
-      color: var(--text);
-      background: rgba(255,255,255,.08);
-      border-color: var(--border);
-    }
-
-    .step-no {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      background: #171717;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      border: 1px solid var(--border);
-    }
-
-    .step-btn.active .step-no { background: var(--white); color: var(--black); }
-    .step-btn.done .step-no { background: rgba(34,197,94,.18); color: #86efac; border-color: rgba(34,197,94,.28); }
-
-    .step-title { font-size: 13px; font-weight: 800; }
-    .step-desc { color: var(--muted-2); font-size: 11px; margin-top: 3px; }
-    .step-status { color: var(--muted-2); font-size: 12px; }
-
-    .main {
-      display: grid;
-      gap: 18px;
-    }
-
-    .hero {
-      border: 1px solid var(--border);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)),
-        var(--panel);
-      border-radius: 24px;
-      padding: 26px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -140px -180px auto;
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.06);
-      pointer-events: none;
-    }
-
-    .hero h2 {
-      margin: 0;
-      font-size: clamp(26px, 4vw, 44px);
-      letter-spacing: -.06em;
-      line-height: 1.05;
-    }
-
-    .hero p {
-      margin: 12px 0 0;
-      color: var(--muted);
-      line-height: 1.8;
-      max-width: 760px;
-    }
-
-    .step-panel {
-      display: none;
-      border: 1px solid var(--border);
-      background: rgba(10,10,10,.76);
-      backdrop-filter: blur(14px);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .step-panel.active { display: block; }
-
-    .panel-header {
-      padding: 22px 22px 18px;
-      border-bottom: 1px solid var(--border-soft);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .panel-header h3 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: -.03em;
-    }
-
-    .panel-header p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .panel-body { padding: 22px; }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-
-    .card.soft { background: rgba(255,255,255,.035); }
-
-    .card h4 {
-      margin: 0 0 12px;
-      font-size: 14px;
-    }
-
-    label {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      margin: 0 0 8px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      color: var(--text);
-      background: #090909;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 11px 12px;
-      outline: none;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #525252;
-      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
-    }
-
-    textarea {
-      min-height: 220px;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.6;
-      resize: vertical;
-    }
-
-    .field { margin-bottom: 14px; }
-    .field:last-child { margin-bottom: 0; }
-
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-top: 16px;
-    }
-
-    button.primary, button.secondary, button.danger, button.ghost {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 11px 14px;
-      cursor: pointer;
-      font-weight: 800;
-      font-size: 13px;
-      transition: transform .15s ease, opacity .15s ease, background .15s ease;
-    }
-
-    button.primary {
-      background: var(--white);
-      color: var(--black);
-      border-color: var(--white);
-    }
-
-    button.secondary {
-      background: #171717;
-      color: var(--text);
-    }
-
-    button.ghost {
-      background: transparent;
-      color: var(--muted);
-    }
-
-    button.danger {
-      background: rgba(239,68,68,.14);
-      color: #fecaca;
-      border-color: rgba(239,68,68,.25);
-    }
-
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-    button:not(:disabled):hover { transform: translateY(-1px); }
-
-    .templates {
-      display: grid;
-      gap: 10px;
-    }
-
-    .template-card {
-      border: 1px solid var(--border);
-      background: #0d0d0d;
-      border-radius: 14px;
-      padding: 14px;
-      cursor: pointer;
-      transition: border-color .15s ease, background .15s ease, transform .15s ease;
-    }
-
-    .template-card:hover { border-color: #525252; transform: translateY(-1px); }
-    .template-card.active { border-color: var(--white); background: rgba(255,255,255,.08); }
-
-    .template-card .name { font-weight: 900; font-size: 14px; }
-    .template-card .meta { color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.6; }
-
-    .preview-wrap {
-      background: #fff;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      min-height: 620px;
-    }
-
-    .preview-top {
-      background: #f4f4f5;
-      border-bottom: 1px solid #e4e4e7;
-      color: #09090b;
-      padding: 12px 14px;
-      font-size: 12px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-    }
-
-    iframe.preview {
-      width: 100%;
-      height: 560px;
-      border: 0;
-      display: block;
-      background: #fff;
-    }
-
-    .empty-preview {
-      height: 560px;
-      display: grid;
-      place-items: center;
-      color: #71717a;
-      text-align: center;
-      padding: 24px;
-      background: #fff;
-    }
-
-    .notice {
-      padding: 13px 14px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 13px;
-      background: rgba(255,255,255,.04);
-    }
-
-    .notice.good { border-color: rgba(34,197,94,.24); background: rgba(34,197,94,.08); color: #bbf7d0; }
-    .notice.warn { border-color: rgba(234,179,8,.24); background: rgba(234,179,8,.08); color: #fef3c7; }
-    .notice.bad { border-color: rgba(239,68,68,.24); background: rgba(239,68,68,.08); color: #fecaca; }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .stat {
-      border: 1px solid var(--border);
-      background: var(--card);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    .stat .num { font-size: 26px; font-weight: 950; letter-spacing: -.05em; }
-    .stat .label { color: var(--muted); font-size: 12px; margin-top: 4px; }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      font-size: 12px;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid var(--border-soft);
-      text-align: left;
-      vertical-align: top;
-      word-break: break-word;
-    }
-
-    th {
-      color: var(--muted);
-      background: #0d0d0d;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    tr:last-child td { border-bottom: 0; }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 11px;
-      font-weight: 800;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: rgba(255,255,255,.04);
-      white-space: nowrap;
-    }
-
-    .badge.good { color: #bbf7d0; background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.22); }
-    .badge.warn { color: #fef3c7; background: rgba(234,179,8,.10); border-color: rgba(234,179,8,.22); }
-    .badge.bad { color: #fecaca; background: rgba(239,68,68,.10); border-color: rgba(239,68,68,.22); }
-    .badge.blue { color: #bfdbfe; background: rgba(96,165,250,.10); border-color: rgba(96,165,250,.22); }
-
-    pre {
-      margin: 0;
-      padding: 14px;
-      background: #020202;
-      color: #d4d4d8;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: auto;
-      white-space: pre-wrap;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.65;
-      max-height: 360px;
-    }
-
-    details.settings {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(255,255,255,.03);
-      overflow: hidden;
-    }
-
-    details.settings summary {
-      cursor: pointer;
-      padding: 14px 16px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-      list-style: none;
-    }
-
-    details.settings summary::-webkit-details-marker { display: none; }
-    .settings-body { padding: 0 16px 16px; }
-
-    .footer-actions {
-      position: sticky;
-      bottom: 0;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 16px 22px;
-      border-top: 1px solid var(--border-soft);
-      background: rgba(10,10,10,.84);
-      backdrop-filter: blur(14px);
-    }
-
-
-
-    .auth-panel {
-      margin-top: 18px;
-      border: 1px solid var(--border);
-      background: rgba(10,10,10,.76);
-      backdrop-filter: blur(14px);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .auth-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: end;
-    }
-
-    .auth-status {
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .auth-status.good { color: #86efac; }
-    .auth-status.bad { color: #fca5a5; }
-
-    .auth-user {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
-      white-space: nowrap;
     }
 
     .hidden { display: none !important; }
 
-    @media (max-width: 1080px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { position: static; }
-      .grid-2 { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 720px) {
-      .app { padding: 18px; }
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .panel-header { flex-direction: column; }
-      .grid-3, .stats { grid-template-columns: 1fr; }
-      .footer-actions { flex-direction: column-reverse; }
-      .footer-actions button { width: 100%; }
-    }
-
-
-    .login-page {
+    .login-wrap {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.06), transparent 32%),
-        #050505;
+        radial-gradient(circle at top left, rgba(0,0,0,0.08), transparent 28%),
+        linear-gradient(180deg, #ffffff 0%, #f6f6f6 100%);
     }
-    .login-page.hidden { display: none; }
+
     .login-card {
-      width: 100%;
-      max-width: 440px;
-      background: rgba(17,17,17,.96);
+      width: min(460px, 100%);
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 24px 80px rgba(0,0,0,.45);
+      box-shadow: var(--shadow);
+      padding: 32px;
     }
-    .login-brand {
+
+    .brand {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 24px;
     }
-    .login-brand .logo {
-      width: 42px;
-      height: 42px;
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
       border-radius: 12px;
-      background: var(--white);
-      color: var(--black);
-      display: grid;
-      place-items: center;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-weight: 800;
-      letter-spacing: -.04em;
+      letter-spacing: -0.04em;
     }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: -2px;
+    }
+
     .login-card h1 {
-      margin: 0;
-      font-size: 22px;
+      margin: 0 0 8px;
+      font-size: 28px;
       line-height: 1.25;
+      letter-spacing: -0.04em;
     }
+
     .login-card p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 650;
+      color: #343740;
+      margin-bottom: 8px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+    }
+
+    textarea {
+      min-height: 132px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      line-height: 1.3;
+      background: #fff;
+      color: #111;
+      border-color: var(--border-dark);
+    }
+
+    .btn:hover { background: #f9fafb; }
+
+    .btn-primary {
+      background: var(--black);
+      color: #fff;
+      border-color: var(--black);
+    }
+
+    .btn-primary:hover {
+      background: var(--black-hover);
+    }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: #f2b8b5;
+      background: #fff;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-bg);
+    }
+
+    .btn-wide { width: 100%; }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .settings-box {
+      border: 1px dashed var(--border-dark);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fafafa;
+      margin-top: 18px;
+    }
+
+    .settings-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-weight: 700;
+      color: #222;
+      text-align: left;
+    }
+
+    .settings-content {
+      margin-top: 14px;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .user-pill {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      max-width: 280px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .main {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 28px 20px 52px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.06em;
+      line-height: 1.08;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 30px rgba(16, 17, 20, 0.04);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 20px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .step-badge {
+      flex: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .card-desc {
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.7;
     }
-    .login-form {
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .row {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
-      margin-top: 18px;
     }
-    .login-status {
-      min-height: 18px;
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
       margin-top: 14px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fbfbfb;
+    }
+
+    .stat-label {
       font-size: 12px;
       color: var(--muted);
-      line-height: 1.6;
-      white-space: pre-line;
+      margin-bottom: 6px;
     }
-    .login-status.good { color: #86efac; }
-    .login-status.bad { color: #fca5a5; }
-    .login-setup {
-      margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border-soft);
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
     }
-    .login-setup details summary {
-      cursor: pointer;
+
+    .notice {
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      background: #fbfbfb;
+      color: #343740;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .notice-ok {
+      border-color: #abefc6;
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+
+    .notice-warn {
+      border-color: #fedf89;
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+
+    .notice-danger {
+      border-color: #fda29b;
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .template-list {
+      display: grid;
+      gap: 10px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .template-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      display: grid;
+      gap: 3px;
+    }
+
+    .template-item:hover,
+    .template-item.active {
+      border-color: #111;
+      box-shadow: 0 0 0 4px rgba(17,17,17,0.06);
+    }
+
+    .template-name {
+      font-weight: 800;
+    }
+
+    .template-meta {
       color: var(--muted);
       font-size: 12px;
+      overflow-wrap: anywhere;
     }
-    .app.locked { display: none; }
+
+    .preview-list {
+      display: grid;
+      gap: 8px;
+      max-height: 180px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      background: #fbfbfb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+    }
+
+    .preview-email {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 7px;
+    }
+
+    .preview-email:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .result-box {
+      white-space: pre-wrap;
+      overflow: auto;
+      max-height: 360px;
+      background: #0f1115;
+      color: #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      margin-top: 14px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .checkbox-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #343740;
+    }
+
+    .checkbox-line input {
+      width: auto;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 820px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-right {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        flex-direction: column;
+      }
+
+      .row,
+      .row-3,
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-  <section class="login-page" id="loginPage">
+  <section id="loginView" class="login-wrap">
     <div class="login-card">
-      <div class="login-brand">
-        <div class="logo">R</div>
+      <div class="brand">
+        <div class="brand-mark">R</div>
         <div>
-          <h1>Refinas Mail</h1>
-          <p>メールアドレスとパスワードでログインしてください。</p>
+          <div class="brand-title">REFINAS Mail</div>
+          <div class="brand-subtitle">メール配信管理画面</div>
         </div>
       </div>
 
-      <div class="login-form">
-        <div class="field">
-          <label for="loginEmail">メールアドレス</label>
-          <input id="loginEmail" type="email" placeholder="refinas.ads@gmail.com" autocomplete="username" />
-        </div>
-        <div class="field">
-          <label for="loginPassword">パスワード</label>
-          <input id="loginPassword" type="password" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') loginAdmin()" />
-        </div>
-        <button class="primary" type="button" onclick="loginAdmin()">ログイン</button>
+      <h1>ログイン</h1>
+      <p>管理者アカウントでログインしてください。</p>
+
+      <div id="loginAlert" class="notice notice-warn hidden"></div>
+
+      <div class="field">
+        <label for="loginEmail">メールアドレス</label>
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="refinas.ads@gmail.com" />
       </div>
 
-      <div class="login-status" id="loginStatus">未ログインです。</div>
+      <div class="field">
+        <label for="loginPassword">パスワード</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="パスワード" />
+      </div>
 
-      <div class="login-setup">
-        <details>
-          <summary>初期設定を開く</summary>
-          <div class="field" style="margin-top:14px;">
-            <label for="loginSupabaseUrl">Supabase Project URL</label>
-            <input id="loginSupabaseUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co" />
+      <button id="loginButton" class="btn btn-primary btn-wide" type="button">ログイン</button>
+
+      <div class="settings-box">
+        <button id="settingsToggle" class="settings-toggle" type="button">
+          <span>初期設定を開く</span>
+          <span>＋</span>
+        </button>
+        <div id="settingsContent" class="settings-content hidden">
+          <div class="field">
+            <label for="settingSupabaseUrl">Supabase URL</label>
+            <input id="settingSupabaseUrl" type="text" />
           </div>
-          <div class="field" style="margin-top:12px;">
-            <label for="loginSupabaseAnonKey">Supabase anon public key</label>
-            <input id="loginSupabaseAnonKey" type="password" value="" placeholder="Project Settings > API > anon public key" autocomplete="off" />
+          <div class="field">
+            <label for="settingAnonKey">Supabase anon public key</label>
+            <textarea id="settingAnonKey" placeholder="anon public keyを貼り付け"></textarea>
+            <div class="small">service_role key は絶対に入れないでください。</div>
           </div>
-          <button class="secondary" type="button" style="margin-top:12px;width:100%;" onclick="saveLoginSettings()">初期設定を保存</button>
-          <p>service_role key は絶対に入力しないでください。</p>
-        </details>
+          <button id="saveSettingsButton" class="btn" type="button">設定を保存</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="app locked" id="appRoot">
+  <section id="appView" class="app-shell hidden">
     <header class="topbar">
-      <div class="brand">
-        <div class="logo">R</div>
+      <div class="topbar-left">
+        <div class="brand-mark">R</div>
         <div>
-          <h1>Refinas Mail</h1>
-          <p class="sub">テンプレート選択から本送信まで、誤送信を防ぎながら進めるメール配信ウィザード。</p>
+          <div class="brand-title">REFINAS Mail</div>
+          <div class="brand-subtitle">CSVメール配信管理</div>
         </div>
       </div>
-      <div class="top-actions">
-        <span class="pill"><span class="dot"></span>Production mode</span>
-        <span class="auth-user" id="authUserPill">未ログイン</span>
-        <button class="ghost hidden" id="logoutButton" type="button" onclick="logoutAdmin()">ログアウト</button>
-        <button class="secondary" type="button" onclick="openStep(0)">新規配信</button>
+      <div class="topbar-right">
+        <span id="currentUser" class="user-pill"></span>
+        <button id="openSettingsButton" class="btn" type="button">設定</button>
+        <button id="logoutButton" class="btn" type="button">ログアウト</button>
       </div>
     </header>
 
-    <details class="settings" id="settingsBox">
-      <summary>接続設定 / Supabase / Function URL</summary>
-      <div class="settings-body">
-        <div class="notice warn" style="margin-bottom:16px;">
-          Supabase Authログイン用に anon public key を保存してください。service_role key は絶対にここへ入れないでください。
-        </div>
-        <div class="grid-3">
-          <div class="field">
-            <label for="supabaseUrl">Supabase Project URL</label>
-            <input id="supabaseUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co" />
-          </div>
-          <div class="field" style="grid-column: span 2;">
-            <label for="supabaseAnonKey">Supabase anon public key</label>
-            <input id="supabaseAnonKey" type="password" value="" placeholder="Project Settings > API > anon public key を貼り付け" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label for="templatesUrl">テンプレート取得 Function URL</label>
-            <input id="templatesUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-resend-templates" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-resend-templates" />
-          </div>
-          <div class="field">
-            <label for="checkSuppressionUrl">配信停止リスト照合 Function URL</label>
-            <input id="checkSuppressionUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/check-suppression-list" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/check-suppression-list" />
-          </div>
-          <div class="field">
-            <label for="createBatchFromListUrl">送信対象作成 Function URL</label>
-            <input id="createBatchFromListUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/create-send-batch-from-list" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/create-send-batch-from-list" />
-          </div>
-          <div class="field">
-            <label for="sendTestUrl">テスト送信 Function URL</label>
-            <input id="sendTestUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-test-email" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-test-email" />
-          </div>
-          <div class="field">
-            <label for="sendBatchUrl">本送信 Function URL</label>
-            <input id="sendBatchUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-approved-batch" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-approved-batch" />
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="secondary" type="button" onclick="saveSettings()">設定を保存</button>
-          <button class="ghost" type="button" onclick="clearSettings()">保存設定を削除</button>
+    <main class="main">
+      <div class="hero">
+        <div>
+          <h1>メールアドレスだけで配信</h1>
+          <p>Resendテンプレートを選び、CSVのメールアドレスだけを読み込んで、本送信まで進めます。</p>
         </div>
       </div>
-    </details>
 
-    <!-- ログイン画面はページ上部で表示します -->
+      <div id="appAlert" class="notice hidden"></div>
 
-    <div class="hero" style="margin-top:18px;">
-      <h2>Campaign builder for safe email delivery.</h2>
-      <p>テンプレートを最初に選び、HTMLプレビューを確認してからリストを読み込みます。リストは保存せず、配信停止リスト照合後に送信対象だけを一時作成します。</p>
-    </div>
-
-    <main class="layout" style="margin-top:18px;">
-      <aside class="sidebar" id="stepNav"></aside>
-
-      <section class="main">
-        <section class="step-panel active" data-step-panel="0">
-          <div class="panel-header">
+      <div class="grid">
+        <section class="card">
+          <div class="card-header">
             <div>
-              <h3>1. テンプレート選択</h3>
-              <p>Resendからテンプレート一覧を取得し、配信で使うテンプレートを選びます。</p>
+              <h2 class="card-title"><span class="step-badge">1</span>テンプレート選択</h2>
+              <p class="card-desc">Resendからテンプレート一覧を取得します。</p>
             </div>
-            <button class="primary" type="button" onclick="loadTemplates()">テンプレートを読み込み</button>
+            <button id="loadTemplatesButton" class="btn btn-primary" type="button">テンプレート読み込み</button>
           </div>
-          <div class="panel-body grid-2">
-            <div class="card">
-              <h4>テンプレート一覧</h4>
-              <div id="templateList" class="templates">
-                <div class="notice">まだ読み込んでいません。「テンプレートを読み込み」を押してください。</div>
-              </div>
-            </div>
-            <div class="card soft">
-              <h4>選択中テンプレート</h4>
-              <div id="selectedTemplateDetail" class="notice">未選択です。</div>
-            </div>
+          <div class="card-body">
+            <div id="selectedTemplateNotice" class="notice notice-warn">まだテンプレートが選択されていません。</div>
+            <div id="templateList" class="template-list"></div>
+            <div id="templateRawBox" class="result-box hidden"></div>
           </div>
         </section>
 
-        <section class="step-panel" data-step-panel="1">
-          <div class="panel-header">
+        <section class="card">
+          <div class="card-header">
             <div>
-              <h3>2. HTMLメールプレビュー</h3>
-              <p>選択したテンプレートのプレビューを確認します。Resend APIから本文プレビューを取得できない場合は、件名とテンプレートIDのみ確認します。</p>
-            </div>
-            <span class="badge blue" id="previewTemplateBadge">No template</span>
-          </div>
-          <div class="panel-body">
-            <div class="preview-wrap">
-              <div class="preview-top">
-                <span id="previewSubject">件名：未選択</span>
-                <span id="previewTemplateId">Template ID：-</span>
-              </div>
-              <div id="previewEmpty" class="empty-preview">テンプレートを選択すると、ここにHTMLメールプレビューを表示します。</div>
-              <iframe id="previewFrame" class="preview hidden" title="HTMLメールプレビュー"></iframe>
+              <h2 class="card-title"><span class="step-badge">2</span>テスト送信</h2>
+              <p class="card-desc">選択したResendテンプレートで、先にテストメールを送ります。</p>
             </div>
           </div>
-        </section>
-
-        <section class="step-panel" data-step-panel="2">
-          <div class="panel-header">
-            <div>
-              <h3>3. リスト設定</h3>
-              <p>CSVをブラウザ上で読み込みます。ここではSupabaseに保存しません。</p>
-            </div>
-            <button class="secondary" type="button" onclick="previewList()">リストを確認</button>
-          </div>
-          <div class="panel-body grid-2">
-            <div class="card">
-              <h4>CSV設定</h4>
+          <div class="card-body">
+            <div class="row">
               <div class="field">
-                <label for="csvFormat">CSV形式</label>
-                <select id="csvFormat">
-                  <option value="refinas">リフィナス元CSV形式</option>
-                  <option value="churned">退会者CSV形式</option>
-                  <option value="standard">標準形式：name,email,store_name,target_date,notes</option>
-                </select>
+                <label for="testEmail">テスト送信先</label>
+                <input id="testEmail" type="email" value="refinas.ads@gmail.com" />
               </div>
+              <div class="field">
+                <label for="testCustomerName">テスト用の名前</label>
+                <input id="testCustomerName" type="text" value="テスト太郎" />
+              </div>
+            </div>
+            <div class="actions">
+              <button id="sendTestButton" class="btn btn-primary" type="button">テスト送信</button>
+            </div>
+            <div id="testResultBox" class="result-box hidden"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><span class="step-badge">3</span>CSV読み込み</h2>
+              <p class="card-desc">CSVはメールアドレスだけでOKです。ヘッダーあり・なし両方対応します。</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
               <div class="field">
                 <label for="csvFile">CSVファイル</label>
-                <input id="csvFile" type="file" accept=".csv,text/csv,.txt,text/plain" />
+                <input id="csvFile" type="file" accept=".csv,text/csv,text/plain" />
+                <div id="csvFileName" class="small">ファイル未選択</div>
               </div>
               <div class="field">
-                <label for="listTypeKey">リスト種別キー</label>
-                <input id="listTypeKey" type="text" value="trial_done" placeholder="trial_done / churned など" />
-              </div>
-              <div class="field">
-                <label for="campaignMemo">配信メモ</label>
-                <input id="campaignMemo" type="text" placeholder="例：2026年6月 体験後フォロー" />
+                <label for="csvText">直接貼り付け</label>
+                <textarea id="csvText" placeholder="email&#10;sample1@example.com&#10;sample2@example.com"></textarea>
               </div>
             </div>
-            <div class="card">
-              <h4>取込データ</h4>
-              <textarea id="listText" placeholder="1行目はヘッダー必須です。CSVファイルを選ぶとここに読み込まれます。"></textarea>
+
+            <div class="actions">
+              <button id="parseCsvButton" class="btn btn-primary" type="button">メールアドレスを読み込む</button>
+              <button id="clearCsvButton" class="btn" type="button">クリア</button>
             </div>
-          </div>
-          <div class="panel-body" style="padding-top:0;">
-            <div id="listPreviewArea" class="notice">リスト未確認です。</div>
+
+            <div class="stat-grid">
+              <div class="stat">
+                <div class="stat-label">抽出メール</div>
+                <div id="statExtracted" class="stat-value">0</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">重複削除後</div>
+                <div id="statUnique" class="stat-value">0</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">バッチ送信OK</div>
+                <div id="statValid" class="stat-value">-</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">配信停止除外</div>
+                <div id="statSuppressed" class="stat-value">-</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">不正・重複</div>
+                <div id="statInvalidDuplicate" class="stat-value">-</div>
+              </div>
+            </div>
+
+            <div class="notice notice-warn">読み込まれたメールアドレスだけを送信対象にします。名前・店舗名などの列は使いません。</div>
+            <div id="emailPreview" class="preview-list hidden"></div>
           </div>
         </section>
 
-        <section class="step-panel" data-step-panel="3">
-          <div class="panel-header">
+        <section class="card">
+          <div class="card-header">
             <div>
-              <h3>4. 配信停止リスト照合</h3>
-              <p>メール形式・重複・配信停止リストを照合し、送信可能者を確定します。</p>
+              <h2 class="card-title"><span class="step-badge">4</span>送信対象作成</h2>
+              <p class="card-desc">重複・配信停止を除外して、送信用バッチを作成します。</p>
             </div>
-            <button class="primary" type="button" onclick="checkSuppressionList()">照合する</button>
           </div>
-          <div class="panel-body">
-            <div class="stats" id="suppressionStats"></div>
-            <div style="height:14px"></div>
-            <div id="suppressionResultArea" class="notice">まだ照合していません。</div>
+          <div class="card-body">
+            <div class="actions">
+              <button id="createBatchButton" class="btn btn-primary" type="button">送信対象を作成</button>
+            </div>
+            <div id="batchNotice" class="notice notice-warn">まだ送信対象は作成されていません。</div>
+            <div id="batchResultBox" class="result-box hidden"></div>
           </div>
         </section>
 
-        <section class="step-panel" data-step-panel="4">
-          <div class="panel-header">
+        <section class="card">
+          <div class="card-header">
             <div>
-              <h3>5. 送信対象作成</h3>
-              <p>照合後の送信可能者だけを一時保存し、送信バッチを作成します。</p>
+              <h2 class="card-title"><span class="step-badge">5</span>本送信</h2>
+              <p class="card-desc">最初は必ず dry run、次に limit: 1 で確認してください。</p>
             </div>
-            <button class="primary" type="button" onclick="createBatchFromList()">送信対象を作成</button>
           </div>
-          <div class="panel-body grid-2">
-            <div class="card">
-              <h4>作成条件</h4>
+          <div class="card-body">
+            <div class="row-3">
               <div class="field">
-                <label for="targetLimit">対象上限</label>
-                <input id="targetLimit" type="number" min="1" value="100" />
+                <label for="batchIdInput">batch_id</label>
+                <input id="batchIdInput" type="text" placeholder="送信対象作成後に自動入力" />
               </div>
               <div class="field">
-                <label for="replyEmail">返信先メール</label>
-                <input id="replyEmail" type="text" value="refinasfitnessstudio@gmail.com" />
+                <label for="sendLimit">送信上限 limit</label>
+                <input id="sendLimit" type="number" min="1" max="500" value="1" />
               </div>
               <div class="field">
-                <label for="subjectOverride">件名上書き</label>
-                <input id="subjectOverride" type="text" placeholder="空欄ならテンプレートの件名" />
-              </div>
-              <div class="field">
-                <label for="campaignText">キャンペーン文言</label>
-                <input id="campaignText" type="text" placeholder="テンプレート変数 campaign_text に渡します" />
+                <label for="sendModeMemo">推奨手順</label>
+                <input id="sendModeMemo" type="text" value="dry run → limit 1 → 本送信" disabled />
               </div>
             </div>
-            <div class="card">
-              <h4>バッチ情報</h4>
-              <div id="batchInfo" class="notice">まだ送信対象を作成していません。</div>
+
+            <div class="actions">
+              <button id="dryRunButton" class="btn" type="button">dry run確認</button>
             </div>
+
+            <label class="checkbox-line">
+              <input id="confirmSendCheckbox" type="checkbox" />
+              <span>dry runの結果を確認しました。本送信を実行します。</span>
+            </label>
+
+            <div class="actions">
+              <button id="sendOneButton" class="btn btn-primary" type="button">limitの件数だけ本送信</button>
+              <button id="sendAllButton" class="btn btn-danger" type="button">最大500件を本送信</button>
+            </div>
+
+            <div class="notice notice-danger">本送信ボタンを押すと実際にメールが送信されます。まずは limit を 1 にしてください。</div>
+            <div id="sendResultBox" class="result-box hidden"></div>
           </div>
         </section>
-
-        <section class="step-panel" data-step-panel="5">
-          <div class="panel-header">
-            <div>
-              <h3>6. テスト送信</h3>
-              <p>本番Resend環境を使って、指定メールアドレスにだけテスト送信します。</p>
-            </div>
-            <button class="primary" type="button" onclick="sendTestEmail()">テスト送信</button>
-          </div>
-          <div class="panel-body grid-2">
-            <div class="card">
-              <h4>テスト送信先</h4>
-              <div class="field">
-                <label for="testEmail">テスト送信先メールアドレス</label>
-                <input id="testEmail" type="email" placeholder="your@example.com" />
-              </div>
-              <div class="notice warn">テスト送信でも本番のResend APIを使用します。配信停止リンクも実際に発行されます。</div>
-            </div>
-            <div class="card">
-              <h4>テスト結果</h4>
-              <pre id="testResult">まだ実行していません。</pre>
-            </div>
-          </div>
-        </section>
-
-        <section class="step-panel" data-step-panel="6">
-          <div class="panel-header">
-            <div>
-              <h3>7. 本送信</h3>
-              <p>確認文言が一致した場合のみ、本番送信を実行します。</p>
-            </div>
-            <button class="danger" type="button" onclick="sendApprovedBatch()">本送信を実行</button>
-          </div>
-          <div class="panel-body grid-2">
-            <div class="card">
-              <h4>最終確認</h4>
-              <div id="finalSummary" class="notice">まだ送信対象が作成されていません。</div>
-              <div class="field" style="margin-top:14px;">
-                <label for="confirmText">確認文言</label>
-                <input id="confirmText" type="text" placeholder="例：SEND 12" />
-              </div>
-              <div class="field">
-                <label for="bccEmail">BCC</label>
-                <input id="bccEmail" type="text" placeholder="複数の場合は半角カンマ区切り" />
-              </div>
-            </div>
-            <div class="card">
-              <h4>本送信結果</h4>
-              <pre id="sendResult">まだ実行していません。</pre>
-            </div>
-          </div>
-        </section>
-
-        <section class="step-panel" data-step-panel="7">
-          <div class="panel-header">
-            <div>
-              <h3>8. 結果確認</h3>
-              <p>送信結果を確認します。Webhook連携後は開封率・クリック率もここに追加できます。</p>
-            </div>
-            <button class="secondary" type="button" onclick="renderFinalResult()">結果を更新</button>
-          </div>
-          <div class="panel-body">
-            <div id="resultSummary" class="notice">まだ結果がありません。</div>
-            <div style="height:14px"></div>
-            <div id="resultTableArea"></div>
-          </div>
-        </section>
-
-        <div class="footer-actions">
-          <button class="secondary" type="button" onclick="prevStep()">戻る</button>
-          <div class="btn-row" style="margin:0;">
-            <button class="ghost" type="button" onclick="resetWizard()">最初から</button>
-            <button class="primary" type="button" onclick="nextStep()">次へ</button>
-          </div>
-        </div>
-      </section>
+      </div>
     </main>
-  </div>
+  </section>
 
   <script>
-    const STORAGE_KEY = 'refinasMailWizardSettingsV2Auth';
-    const DEFAULT_SUPABASE_URL = 'https://gusxlxuosndznwhrcgnh.supabase.co';
-    const DEFAULT_SUPABASE_ANON_KEY = '';
+    const DEFAULT_SUPABASE_URL = "https://gusxlxuosndznwhrcgnh.supabase.co";
+    const STORAGE_KEY = "refinas_mail_admin_v4";
+
     let supabaseClient = null;
-    let currentUser = null;
+    let currentSession = null;
+    let selectedTemplate = null;
+    let parsedEmails = [];
+    let currentBatchId = "";
 
-    const DEFAULT_FUNCTION_URLS = {
-      templatesUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-resend-templates',
-      checkSuppressionUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/check-suppression-list',
-      createBatchFromListUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/create-send-batch-from-list',
-      sendTestUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-test-email',
-      sendBatchUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-approved-batch',
-    };
+    const el = (id) => document.getElementById(id);
 
-    const steps = [
-      ['テンプレート', '最初に選ぶ'],
-      ['プレビュー', 'HTML確認'],
-      ['リスト設定', '保存しない'],
-      ['配信停止照合', '除外確認'],
-      ['対象作成', '一時保存'],
-      ['テスト送信', '本番環境'],
-      ['本送信', '確認文言'],
-      ['結果確認', '送信結果'],
-    ];
-
-    const state = {
-      currentStep: 0,
-      templates: [],
-      selectedTemplate: null,
-      rawRecords: [],
-      checkedRecords: [],
-      excludedRecords: [],
-      batch: null,
-      createBatchResponse: null,
-      sendResponse: null,
-    };
-
-    window.addEventListener('load', async () => {
-      renderStepNav();
-      bindCsvFile();
-      loadSettings();
-      initSupabaseClient();
-      await refreshAuthState();
-    });
-
-    function renderStepNav() {
-      const nav = document.getElementById('stepNav');
-      nav.innerHTML = steps.map((step, index) => `
-        <button class="step-btn ${index === state.currentStep ? 'active' : ''}" type="button" onclick="openStep(${index})">
-          <span class="step-no">${index + 1}</span>
-          <span>
-            <span class="step-title">${escapeHtml(step[0])}</span>
-            <span class="step-desc">${escapeHtml(step[1])}</span>
-          </span>
-          <span class="step-status">${index < state.currentStep ? '✓' : ''}</span>
-        </button>
-      `).join('');
-    }
-
-    function openStep(index) {
-      state.currentStep = Math.max(0, Math.min(steps.length - 1, index));
-      document.querySelectorAll('[data-step-panel]').forEach((panel, i) => {
-        panel.classList.toggle('active', i === state.currentStep);
-      });
-      renderStepNav();
-    }
-
-    function nextStep() { openStep(state.currentStep + 1); }
-    function prevStep() { openStep(state.currentStep - 1); }
-
-    function getUrl(id, label) {
-      const value = document.getElementById(id).value.trim();
-      if (!value) throw new Error(`${label}を入力してください。`);
-      return value;
-    }
-
-    function getSupabaseUrl() {
-      return (document.getElementById('supabaseUrl')?.value || DEFAULT_SUPABASE_URL).trim();
-    }
-
-    function getSupabaseAnonKey() {
-      return (document.getElementById('supabaseAnonKey')?.value || DEFAULT_SUPABASE_ANON_KEY).trim();
-    }
-
-    function initSupabaseClient() {
-      const url = getSupabaseUrl();
-      const anonKey = getSupabaseAnonKey();
-
-      if (!url || !anonKey) {
-        supabaseClient = null;
-        updateAuthUi(null, 'Supabase anon public key が未設定です。接続設定に貼り付けて保存してください。');
-        return false;
-      }
-
-      if (!window.supabase || !window.supabase.createClient) {
-        supabaseClient = null;
-        updateAuthUi(null, 'Supabase JS SDKを読み込めませんでした。ネットワークを確認してください。');
-        return false;
-      }
-
-      supabaseClient = window.supabase.createClient(url, anonKey);
-      return true;
-    }
-
-    async function refreshAuthState() {
-      if (!supabaseClient && !initSupabaseClient()) return null;
-
-      try {
-        const { data, error } = await supabaseClient.auth.getSession();
-        if (error) throw error;
-        currentUser = data.session?.user || null;
-        updateAuthUi(currentUser);
-        return currentUser;
-      } catch (error) {
-        currentUser = null;
-        updateAuthUi(null, error.message || 'ログイン状態の確認に失敗しました。');
-        return null;
-      }
-    }
-
-    function updateAuthUi(user, message) {
-      const pill = document.getElementById('authUserPill');
-      const loginStatus = document.getElementById('loginStatus');
-      const authStatus = document.getElementById('authStatus');
-      const logout = document.getElementById('logoutButton');
-      const loginPage = document.getElementById('loginPage');
-      const appRoot = document.getElementById('appRoot');
-
-      if (user) {
-        if (pill) pill.textContent = `ログイン中：${user.email || user.id}`;
-        if (loginStatus) {
-          loginStatus.className = 'login-status good';
-          loginStatus.textContent = `ログイン中：${user.email || user.id}`;
+    function getDefaultSettings() {
+      const supabaseUrl = DEFAULT_SUPABASE_URL;
+      return {
+        supabaseUrl,
+        anonKey: "",
+        functions: {
+          getResendTemplates: `${supabaseUrl}/functions/v1/get-resend-templates`,
+          sendTestEmail: `${supabaseUrl}/functions/v1/send-test-email`,
+          createSendBatch: `${supabaseUrl}/functions/v1/create-send-batch`,
+          sendApprovedBatch: `${supabaseUrl}/functions/v1/send-approved-batch`
         }
-        if (authStatus) {
-          authStatus.className = 'auth-status good';
-          authStatus.textContent = `ログイン中：${user.email || user.id}`;
-        }
-        if (logout) logout.classList.remove('hidden');
-        if (loginPage) loginPage.classList.add('hidden');
-        if (appRoot) appRoot.classList.remove('locked');
-      } else {
-        if (pill) pill.textContent = '未ログイン';
-        const text = message || 'メールアドレスとパスワードでログインしてください。';
-        if (loginStatus) {
-          loginStatus.className = message ? 'login-status bad' : 'login-status';
-          loginStatus.textContent = text;
-        }
-        if (authStatus) {
-          authStatus.className = message ? 'auth-status bad' : 'auth-status';
-          authStatus.textContent = text;
-        }
-        if (logout) logout.classList.add('hidden');
-        if (loginPage) loginPage.classList.remove('hidden');
-        if (appRoot) appRoot.classList.add('locked');
-      }
-    }
-
-
-    function syncLoginSettingsToMain() {
-      const loginUrl = document.getElementById('loginSupabaseUrl');
-      const loginAnon = document.getElementById('loginSupabaseAnonKey');
-      const mainUrl = document.getElementById('supabaseUrl');
-      const mainAnon = document.getElementById('supabaseAnonKey');
-
-      if (loginUrl && mainUrl && loginUrl.value.trim()) mainUrl.value = loginUrl.value.trim();
-      if (loginAnon && mainAnon && loginAnon.value.trim()) mainAnon.value = loginAnon.value.trim();
-    }
-
-    function syncMainSettingsToLogin() {
-      const loginUrl = document.getElementById('loginSupabaseUrl');
-      const loginAnon = document.getElementById('loginSupabaseAnonKey');
-      const mainUrl = document.getElementById('supabaseUrl');
-      const mainAnon = document.getElementById('supabaseAnonKey');
-
-      if (loginUrl && mainUrl) loginUrl.value = mainUrl.value || DEFAULT_SUPABASE_URL;
-      if (loginAnon && mainAnon) loginAnon.value = mainAnon.value || DEFAULT_SUPABASE_ANON_KEY;
-    }
-
-    function saveLoginSettings() {
-      syncLoginSettingsToMain();
-      saveSettings(false);
-      initSupabaseClient();
-      updateAuthUi(currentUser, '初期設定を保存しました。ログインしてください。');
-    }
-
-    async function loginAdmin() {
-      try {
-        syncLoginSettingsToMain();
-        if (!supabaseClient && !initSupabaseClient()) {
-          throw new Error('先に接続設定で Supabase anon public key を保存してください。');
-        }
-
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-
-        if (!email) throw new Error('メールアドレスを入力してください。');
-        if (!password) throw new Error('パスワードを入力してください。');
-
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        currentUser = data.user || null;
-        updateAuthUi(currentUser);
-      } catch (error) {
-        updateAuthUi(null, error.message || 'ログインに失敗しました。');
-      }
-    }
-
-    async function logoutAdmin() {
-      try {
-        if (supabaseClient) await supabaseClient.auth.signOut();
-      } catch (_) {}
-      currentUser = null;
-      updateAuthUi(null, 'ログアウトしました。');
-    }
-
-    async function getAccessToken() {
-      if (!supabaseClient && !initSupabaseClient()) {
-        throw new Error('Supabase anon public key が未設定です。接続設定に貼り付けて保存してください。');
-      }
-
-      const { data, error } = await supabaseClient.auth.getSession();
-      if (error) throw error;
-
-      const token = data.session?.access_token;
-      if (!token) {
-        updateAuthUi(null, 'ログインが必要です。');
-        throw new Error('ログインしてください。');
-      }
-
-      currentUser = data.session?.user || null;
-      updateAuthUi(currentUser);
-      return token;
-    }
-
-    async function callFunction(url, payload) {
-      const token = await getAccessToken();
-      const anonKey = getSupabaseAnonKey();
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          ...(anonKey ? { 'apikey': anonKey } : {}),
-        },
-        body: JSON.stringify(payload || {}),
-      });
-
-      const data = await response.json().catch(async () => {
-        const text = await response.text().catch(() => '');
-        return text ? { raw: text } : null;
-      });
-
-      if (!response.ok) {
-        throw new Error(JSON.stringify(data, null, 2));
-      }
-      return data;
-    }
-
-    function saveSettings(showAlert = true) {
-      const ids = ['supabaseUrl', 'supabaseAnonKey', 'templatesUrl', 'checkSuppressionUrl', 'createBatchFromListUrl', 'sendTestUrl', 'sendBatchUrl'];
-      const data = {};
-      ids.forEach(id => data[id] = document.getElementById(id).value.trim());
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      initSupabaseClient();
-      refreshAuthState();
-      syncMainSettingsToLogin();
-      if (showAlert) alert('設定を保存しました。');
+      };
     }
 
     function loadSettings() {
-      const supabaseUrlEl = document.getElementById('supabaseUrl');
-      if (supabaseUrlEl && !supabaseUrlEl.value) supabaseUrlEl.value = DEFAULT_SUPABASE_URL;
+      const defaults = getDefaultSettings();
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        return {
+          ...defaults,
+          ...saved,
+          functions: {
+            ...defaults.functions,
+            ...(saved.functions || {})
+          }
+        };
+      } catch {
+        return defaults;
+      }
+    }
 
-      Object.entries(DEFAULT_FUNCTION_URLS).forEach(([id, value]) => {
-        const el = document.getElementById(id);
-        if (el && !el.value) el.value = value;
-      });
+    function saveSettings(settings) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    }
 
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) {
-        syncMainSettingsToLogin();
+    function fillSettingsForm() {
+      const settings = loadSettings();
+      el("settingSupabaseUrl").value = settings.supabaseUrl || DEFAULT_SUPABASE_URL;
+      el("settingAnonKey").value = settings.anonKey || "";
+    }
+
+    function getSettingsFromForm() {
+      const supabaseUrl = el("settingSupabaseUrl").value.trim() || DEFAULT_SUPABASE_URL;
+      const anonKey = el("settingAnonKey").value.trim();
+      return {
+        supabaseUrl,
+        anonKey,
+        functions: {
+          getResendTemplates: `${supabaseUrl}/functions/v1/get-resend-templates`,
+          sendTestEmail: `${supabaseUrl}/functions/v1/send-test-email`,
+          createSendBatch: `${supabaseUrl}/functions/v1/create-send-batch`,
+          sendApprovedBatch: `${supabaseUrl}/functions/v1/send-approved-batch`
+        }
+      };
+    }
+
+    function initSupabase() {
+      const settings = loadSettings();
+      if (!settings.supabaseUrl || !settings.anonKey) {
+        supabaseClient = null;
+        return false;
+      }
+      supabaseClient = window.supabase.createClient(settings.supabaseUrl, settings.anonKey);
+      return true;
+    }
+
+    function showLoginAlert(message, type = "warn") {
+      const box = el("loginAlert");
+      box.className = `notice notice-${type}`;
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    function showAppAlert(message, type = "warn") {
+      const box = el("appAlert");
+      box.className = `notice notice-${type}`;
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    function hideAppAlert() {
+      el("appAlert").classList.add("hidden");
+    }
+
+    function showLoginView() {
+      el("loginView").classList.remove("hidden");
+      el("appView").classList.add("hidden");
+    }
+
+    function showAppView() {
+      el("loginView").classList.add("hidden");
+      el("appView").classList.remove("hidden");
+    }
+
+    function setLoading(button, loadingText) {
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = loadingText;
+      return () => {
+        button.disabled = false;
+        button.textContent = original;
+      };
+    }
+
+    async function refreshSession() {
+      if (!supabaseClient) return null;
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) throw error;
+      currentSession = data.session;
+      return currentSession;
+    }
+
+    async function requireSession() {
+      const session = await refreshSession();
+      if (!session?.access_token) {
+        showLoginView();
+        throw new Error("ログインしてください");
+      }
+      return session;
+    }
+
+    async function callFunction(url, payload, options = {}) {
+      const session = await requireSession();
+      const method = options.method || "POST";
+      const fetchOptions = {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`
+        }
+      };
+      if (method !== "GET") {
+        fetchOptions.body = JSON.stringify(payload || {});
+      }
+      const res = await fetch(url, fetchOptions);
+      const text = await res.text();
+      let json = null;
+      try {
+        json = text ? JSON.parse(text) : null;
+      } catch {
+        json = { raw: text };
+      }
+      if (!res.ok || json?.success === false) {
+        const error = new Error(json?.error || json?.error_message || `HTTP ${res.status}`);
+        error.response = json;
+        throw error;
+      }
+      return json;
+    }
+
+    function renderJson(targetId, data) {
+      const box = el(targetId);
+      box.textContent = JSON.stringify(data, null, 2);
+      box.classList.remove("hidden");
+    }
+
+    function normalizeTemplates(response) {
+      const list = Array.isArray(response?.templates)
+        ? response.templates
+        : Array.isArray(response?.data)
+          ? response.data
+          : [];
+      return list.map((t) => {
+        const id = t.resend_template_id || t.id || t.template_id || t.alias || t.name || "";
+        const name = t.template_name || t.name || t.alias || id || "名称未設定テンプレート";
+        return {
+          ...t,
+          id,
+          resend_template_id: id,
+          template_name: name,
+          subject: t.subject || name
+        };
+      }).filter((t) => t.resend_template_id);
+    }
+
+    function renderTemplates(templates) {
+      const list = el("templateList");
+      list.innerHTML = "";
+      if (!templates.length) {
+        list.innerHTML = `<div class="notice notice-warn">テンプレートが見つかりませんでした。</div>`;
         return;
       }
+
+      templates.forEach((template) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "template-item";
+        button.innerHTML = `
+          <div class="template-name"></div>
+          <div class="template-meta"></div>
+          <div class="template-meta"></div>
+        `;
+        button.querySelector(".template-name").textContent = template.template_name;
+        button.querySelectorAll(".template-meta")[0].textContent = `ID: ${template.resend_template_id}`;
+        button.querySelectorAll(".template-meta")[1].textContent = template.subject ? `Subject: ${template.subject}` : "";
+        button.addEventListener("click", () => selectTemplate(template, button));
+        list.appendChild(button);
+      });
+    }
+
+    function selectTemplate(template, button) {
+      selectedTemplate = template;
+      document.querySelectorAll(".template-item").forEach((item) => item.classList.remove("active"));
+      if (button) button.classList.add("active");
+
+      const notice = el("selectedTemplateNotice");
+      notice.className = "notice notice-ok";
+      notice.textContent = `選択中：${template.template_name} / ${template.resend_template_id}`;
+      renderJson("templateRawBox", template);
+    }
+
+    function extractEmailsFromText(text) {
+      const matches = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || [];
+      return matches.map((email) => email.trim().toLowerCase());
+    }
+
+    function unique(values) {
+      return Array.from(new Set(values));
+    }
+
+    function renderEmailPreview() {
+      const preview = el("emailPreview");
+      preview.innerHTML = "";
+      if (!parsedEmails.length) {
+        preview.classList.add("hidden");
+        return;
+      }
+      parsedEmails.slice(0, 50).forEach((email, index) => {
+        const row = document.createElement("div");
+        row.className = "preview-email";
+        row.innerHTML = `<span></span><span></span>`;
+        row.children[0].textContent = email;
+        row.children[1].textContent = `#${index + 1}`;
+        preview.appendChild(row);
+      });
+      if (parsedEmails.length > 50) {
+        const row = document.createElement("div");
+        row.className = "small";
+        row.textContent = `他 ${parsedEmails.length - 50} 件`;
+        preview.appendChild(row);
+      }
+      preview.classList.remove("hidden");
+    }
+
+    function updateStatsFromParsed(extractedCount, uniqueCount) {
+      el("statExtracted").textContent = String(extractedCount);
+      el("statUnique").textContent = String(uniqueCount);
+      el("statValid").textContent = "-";
+      el("statSuppressed").textContent = "-";
+      el("statInvalidDuplicate").textContent = "-";
+    }
+
+    function updateStatsFromBatch(counts) {
+      el("statValid").textContent = String(counts?.valid_count ?? "-");
+      el("statSuppressed").textContent = String(counts?.suppressed_count ?? "-");
+      const invalid = Number(counts?.invalid_count || 0);
+      const duplicate = Number(counts?.duplicate_count || 0);
+      el("statInvalidDuplicate").textContent = String(invalid + duplicate);
+    }
+
+    async function login() {
+      const done = setLoading(el("loginButton"), "ログイン中...");
       try {
-        const data = JSON.parse(saved);
-        Object.entries(data).forEach(([id, value]) => {
-          const el = document.getElementById(id);
-          if (el) el.value = value || DEFAULT_FUNCTION_URLS[id] || (id === 'supabaseUrl' ? DEFAULT_SUPABASE_URL : '');
-        });
-      } catch (_) {}
-      syncMainSettingsToLogin();
+        if (!initSupabase()) {
+          showLoginAlert("初期設定で Supabase anon public key を保存してください。", "warn");
+          el("settingsContent").classList.remove("hidden");
+          return;
+        }
+        const email = el("loginEmail").value.trim();
+        const password = el("loginPassword").value;
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentSession = data.session;
+        await bootApp();
+      } catch (error) {
+        showLoginAlert(error.message || "ログインに失敗しました。", "danger");
+      } finally {
+        done();
+      }
     }
 
-    function clearSettings() {
-      localStorage.removeItem(STORAGE_KEY);
-      alert('保存設定を削除しました。');
-      location.reload();
+    async function logout() {
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+      }
+      currentSession = null;
+      showLoginView();
     }
 
-    function normalizeTemplateFromApi(template) {
-      const resendId =
-        template.resend_template_id ||
-        template.template_id ||
-        template.id ||
-        template.alias ||
-        template.name ||
-        template.template_key ||
-        '';
-
-      const key = template.template_key || resendId;
-      const name =
-        template.template_name ||
-        template.name ||
-        template.alias ||
-        template.subject ||
-        key ||
-        '名称未設定テンプレート';
-
-      return {
-        ...template,
-        template_key: key,
-        template_name: name,
-        resend_template_id: resendId,
-        subject: template.subject || name,
-        description: template.description || template.status || '',
-        preview_html: template.preview_html || '',
-      };
+    async function bootApp() {
+      const session = await refreshSession();
+      if (!session) {
+        showLoginView();
+        return;
+      }
+      el("currentUser").textContent = session.user?.email || "ログイン中";
+      showAppView();
     }
 
     async function loadTemplates() {
+      const done = setLoading(el("loadTemplatesButton"), "読み込み中...");
+      hideAppAlert();
       try {
-        const url = getUrl('templatesUrl', 'テンプレート取得 Function URL');
-        const data = await callFunction(url, { limit: 100 });
-        state.templates = (Array.isArray(data.templates) ? data.templates : []).map(normalizeTemplateFromApi);
-        renderTemplates();
-        if (state.templates[0]) selectTemplate(state.templates[0].template_key);
+        const settings = loadSettings();
+        const response = await callFunction(settings.functions.getResendTemplates, null, { method: "GET" });
+        const templates = normalizeTemplates(response);
+        renderTemplates(templates);
+        showAppAlert(`テンプレートを ${templates.length} 件取得しました。`, "ok");
       } catch (error) {
-        document.getElementById('templateList').innerHTML = `<div class="notice bad">${escapeHtml(error.message)}</div>`;
+        showAppAlert(`テンプレート取得に失敗しました：${error.message}`, "danger");
+        if (error.response) renderJson("templateRawBox", error.response);
+      } finally {
+        done();
       }
-    }
-
-    function renderTemplates() {
-      const area = document.getElementById('templateList');
-      if (!state.templates.length) {
-        area.innerHTML = '<div class="notice">テンプレートがありません。</div>';
-        return;
-      }
-      area.innerHTML = state.templates.map(t => `
-        <div class="template-card ${state.selectedTemplate && state.selectedTemplate.template_key === t.template_key ? 'active' : ''}" onclick="selectTemplate('${escapeAttr(t.template_key)}')">
-          <div class="name">${escapeHtml(t.template_name || t.template_key)}</div>
-          <div class="meta">
-            件名：${escapeHtml(t.subject || '-')}<br>
-            Template ID：${escapeHtml(t.resend_template_id || '-')}<br>
-            ${escapeHtml(t.description || '')}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function selectTemplate(templateKey) {
-      const template = state.templates.find(t => t.template_key === templateKey);
-      if (!template) return;
-      state.selectedTemplate = template;
-      renderTemplates();
-      document.getElementById('selectedTemplateDetail').innerHTML = `
-        <strong>${escapeHtml(template.template_name || template.template_key)}</strong><br>
-        <span style="color:var(--muted);line-height:1.8;">
-          template_key：${escapeHtml(template.template_key)}<br>
-          件名：${escapeHtml(template.subject || '-')}<br>
-          ResendテンプレートID：${escapeHtml(template.resend_template_id || '-')}<br>
-          説明：${escapeHtml(template.description || '-')}
-        </span>
-      `;
-      updatePreview();
-    }
-
-    function updatePreview() {
-      const t = state.selectedTemplate;
-      document.getElementById('previewTemplateBadge').textContent = t ? t.template_name || t.template_key : 'No template';
-      document.getElementById('previewSubject').textContent = `件名：${t ? (t.subject || '-') : '未選択'}`;
-      document.getElementById('previewTemplateId').textContent = `Template ID：${t ? (t.resend_template_id || '-') : '-'}`;
-
-      const empty = document.getElementById('previewEmpty');
-      const frame = document.getElementById('previewFrame');
-      if (!t || !t.preview_html) {
-        empty.classList.remove('hidden');
-        frame.classList.add('hidden');
-        frame.srcdoc = '';
-        return;
-      }
-      empty.classList.add('hidden');
-      frame.classList.remove('hidden');
-      frame.srcdoc = t.preview_html;
-    }
-
-    function bindCsvFile() {
-      const input = document.getElementById('csvFile');
-      input.addEventListener('change', async () => {
-        const file = input.files && input.files[0];
-        if (!file) return;
-        const text = await file.text();
-        document.getElementById('listText').value = text.replace(/^\uFEFF/, '');
-        previewList();
-      });
-    }
-
-    function parseCsvLine(line, delimiter) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        const next = line[i + 1];
-        if (char === '"' && inQuotes && next === '"') {
-          current += '"';
-          i++;
-        } else if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === delimiter && !inQuotes) {
-          result.push(current);
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      result.push(current);
-      return result;
-    }
-
-    function buildRowObject(line, headers, delimiter) {
-      const values = parseCsvLine(line, delimiter);
-      const row = {};
-      headers.forEach((header, index) => row[header] = (values[index] || '').trim());
-      return row;
-    }
-
-    function normalizeDate(value) {
-      if (!value || String(value).trim() === '') return null;
-      const raw = String(value).trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-      const slash = raw.match(/^(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})$/);
-      if (slash) return `${slash[1]}-${slash[2].padStart(2, '0')}-${slash[3].padStart(2, '0')}`;
-      const compact = raw.match(/^(\d{4})(\d{2})(\d{2})$/);
-      if (compact) return `${compact[1]}-${compact[2]}-${compact[3]}`;
-      return raw;
-    }
-
-    function normalizeMonthToDate(value) {
-      if (!value || String(value).trim() === '') return null;
-      const raw = String(value).trim();
-      const ym = raw.match(/^(\d{4})[-\/.年](\d{1,2})月?$/);
-      if (ym) return `${ym[1]}-${ym[2].padStart(2, '0')}-01`;
-      return normalizeDate(raw);
-    }
-
-    function parseListText() {
-      const text = document.getElementById('listText').value.trim();
-      const format = document.getElementById('csvFormat').value;
-      if (!text) throw new Error('取込データを入力してください。');
-
-      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-      if (lines.length < 2) throw new Error('ヘッダー行とデータ行が必要です。');
-
-      const delimiter = lines[0].includes('\t') ? '\t' : ',';
-      const headers = parseCsvLine(lines[0], delimiter).map(h => h.trim());
-      const records = [];
-
-      if (format === 'standard') {
-        for (const required of ['name', 'email']) {
-          if (!headers.includes(required)) throw new Error(`必須列 ${required} がありません。`);
-        }
-        for (let i = 1; i < lines.length; i++) {
-          const row = buildRowObject(lines[i], headers, delimiter);
-          if (!row.name || !row.email) continue;
-          records.push({
-            name: row.name,
-            email: row.email,
-            store_name: row.store_name || null,
-            target_date: normalizeDate(row.target_date || row.trial_date),
-            notes: row.notes || null,
-          });
-        }
-      } else if (format === 'churned') {
-        const required = ['メールアドレス', '姓（漢字）', '名（漢字）', 'トレーニング最終月', 'ご退会理由'];
-        for (const h of required) if (!headers.includes(h)) throw new Error(`退会者CSV形式に必要な列 ${h} がありません。`);
-        for (let i = 1; i < lines.length; i++) {
-          const row = buildRowObject(lines[i], headers, delimiter);
-          const email = row['メールアドレス'];
-          const name = `${row['姓（漢字）'] || ''} ${row['名（漢字）'] || ''}`.trim();
-          if (!name || !email) continue;
-          records.push({
-            name,
-            email,
-            store_name: null,
-            target_date: normalizeMonthToDate(row['トレーニング最終月']),
-            notes: row['ご退会理由'] ? `退会理由:${row['ご退会理由']}` : null,
-            churn_reason: row['ご退会理由'] || null,
-          });
-        }
-      } else {
-        const required = ['登録店舗', '名前', 'メールアドレス1', '会員登録日'];
-        for (const h of required) if (!headers.includes(h)) throw new Error(`リフィナス元CSV形式に必要な列 ${h} がありません。`);
-        for (let i = 1; i < lines.length; i++) {
-          const row = buildRowObject(lines[i], headers, delimiter);
-          const email = row['メールアドレス1'];
-          const name = row['名前'];
-          if (!name || !email) continue;
-          records.push({
-            name,
-            email,
-            store_name: row['登録店舗'] || null,
-            target_date: normalizeDate(row['会員登録日']),
-            notes: row['会員登録区分'] ? `会員登録区分:${row['会員登録区分']}` : null,
-          });
-        }
-      }
-
-      if (!records.length) throw new Error('有効なレコードがありません。');
-      return records;
-    }
-
-    function previewList() {
-      try {
-        state.rawRecords = parseListText();
-        document.getElementById('listPreviewArea').innerHTML = renderRecordsTable(state.rawRecords.slice(0, 50), `取込予定：${state.rawRecords.length}件。先頭50件を表示しています。`);
-      } catch (error) {
-        document.getElementById('listPreviewArea').className = 'notice bad';
-        document.getElementById('listPreviewArea').textContent = error.message;
-      }
-    }
-
-    async function checkSuppressionList() {
-      try {
-        if (!state.rawRecords.length) state.rawRecords = parseListText();
-        const url = getUrl('checkSuppressionUrl', '配信停止リスト照合 Function URL');
-        const payload = {
-          records: state.rawRecords,
-          list_type_key: document.getElementById('listTypeKey').value.trim() || null,
-        };
-        const data = await callFunction(url, payload);
-        state.checkedRecords = data.sendable_records || data.valid_records || [];
-        state.excludedRecords = data.excluded_records || [];
-        renderSuppressionResult(data);
-      } catch (error) {
-        document.getElementById('suppressionResultArea').className = 'notice bad';
-        document.getElementById('suppressionResultArea').textContent = error.message;
-      }
-    }
-
-    function renderSuppressionResult(data) {
-      const stats = data.summary || {
-        imported: state.rawRecords.length,
-        sendable: state.checkedRecords.length,
-        excluded: state.excludedRecords.length,
-        duplicates: 0,
-      };
-      document.getElementById('suppressionStats').innerHTML = `
-        ${statBox(stats.imported ?? state.rawRecords.length, '取込件数')}
-        ${statBox(stats.sendable ?? state.checkedRecords.length, '送信可能')}
-        ${statBox(stats.excluded ?? state.excludedRecords.length, '除外')}
-        ${statBox(stats.suppressed ?? 0, '配信停止済み')}
-      `;
-      document.getElementById('suppressionResultArea').className = 'notice good';
-      document.getElementById('suppressionResultArea').innerHTML = renderRecordsTable(state.checkedRecords.slice(0, 50), `照合完了：送信可能 ${state.checkedRecords.length}件。先頭50件を表示しています。`);
-    }
-
-    function statBox(num, label) {
-      return `<div class="stat"><div class="num">${escapeHtml(num)}</div><div class="label">${escapeHtml(label)}</div></div>`;
-    }
-
-    async function createBatchFromList() {
-      try {
-        if (!state.selectedTemplate) throw new Error('テンプレートを選択してください。');
-        if (!state.checkedRecords.length) throw new Error('先に配信停止リスト照合を実行してください。');
-        const url = getUrl('createBatchFromListUrl', '送信対象作成 Function URL');
-        const limit = Number(document.getElementById('targetLimit').value || 100);
-        const records = state.checkedRecords.slice(0, limit);
-        const payload = {
-          template_key: state.selectedTemplate.template_key,
-          resend_template_id: state.selectedTemplate.resend_template_id,
-          template_name: state.selectedTemplate.template_name,
-          subject: document.getElementById('subjectOverride').value.trim() || state.selectedTemplate.subject || '',
-          list_type_key: document.getElementById('listTypeKey').value.trim() || null,
-          records,
-          notes: document.getElementById('campaignMemo').value.trim() || null,
-          limit,
-        };
-        const data = await callFunction(url, payload);
-        state.batch = data.batch || data;
-        state.createBatchResponse = data;
-        renderBatchInfo(data);
-      } catch (error) {
-        document.getElementById('batchInfo').className = 'notice bad';
-        document.getElementById('batchInfo').textContent = error.message;
-      }
-    }
-
-    function renderBatchInfo(data) {
-      const batch = data.batch || data;
-      const confirmText = batch.confirm_text || data.confirm_text || '';
-      if (confirmText) document.getElementById('confirmText').value = confirmText;
-      document.getElementById('batchInfo').className = 'notice good';
-      document.getElementById('batchInfo').innerHTML = `
-        <strong>送信対象を作成しました。</strong><br>
-        batch_id：${escapeHtml(batch.id || data.batch_id || '-')}<br>
-        template_key：${escapeHtml(batch.template_key || state.selectedTemplate.template_key)}<br>
-        対象件数：${escapeHtml(batch.target_count || data.target_count || state.checkedRecords.length)}<br>
-        確認文言：<strong>${escapeHtml(confirmText || '-')}</strong>
-      `;
-      renderFinalSummary();
     }
 
     async function sendTestEmail() {
-      try {
-        if (!state.selectedTemplate) throw new Error('テンプレートを選択してください。');
-        const testEmail = document.getElementById('testEmail').value.trim();
-        if (!testEmail) throw new Error('テスト送信先メールアドレスを入力してください。');
-        const url = getUrl('sendTestUrl', 'テスト送信 Function URL');
-        const sample = state.checkedRecords[0] || state.rawRecords[0] || {
-          name: 'テスト太郎',
-          email: testEmail,
-          store_name: 'リフィナス',
-        };
-
-        const payload = {
-          test_email: testEmail,
-          template_key: state.selectedTemplate.template_key,
-          resend_template_id: state.selectedTemplate.resend_template_id,
-          template_name: state.selectedTemplate.template_name,
-          name: sample.name || 'テスト様',
-          store_name: sample.store_name || sample.store || 'リフィナス',
-          reply_email: document.getElementById('replyEmail').value.trim(),
-          subject: document.getElementById('subjectOverride').value.trim() || undefined,
-          campaign_text: document.getElementById('campaignText').value.trim() || '',
-          sample,
-        };
-        const data = await callFunction(url, payload);
-        document.getElementById('testResult').textContent = JSON.stringify(data, null, 2);
-      } catch (error) {
-        document.getElementById('testResult').textContent = error.message;
-      }
-    }
-
-    function renderFinalSummary() {
-      const batch = state.batch || {};
-      document.getElementById('finalSummary').innerHTML = `
-        テンプレート：${escapeHtml(state.selectedTemplate ? state.selectedTemplate.template_name : '-')}<br>
-        件名：${escapeHtml(document.getElementById('subjectOverride').value.trim() || (state.selectedTemplate ? state.selectedTemplate.subject : '-'))}<br>
-        送信対象：${escapeHtml(batch.target_count || state.checkedRecords.length || 0)}件<br>
-        batch_id：${escapeHtml(batch.id || '-')}<br>
-        確認文言：${escapeHtml(batch.confirm_text || '-')}
-      `;
-    }
-
-    async function sendApprovedBatch() {
-      try {
-        if (!state.batch || !state.batch.id) throw new Error('先に送信対象を作成してください。');
-        const ok = confirm('本当に本送信しますか？この操作で実際にメールが送信されます。');
-        if (!ok) return;
-        const url = getUrl('sendBatchUrl', '本送信 Function URL');
-        const payload = {
-          batch_id: state.batch.id,
-          resend_template_id: state.selectedTemplate ? state.selectedTemplate.resend_template_id : undefined,
-          template_name: state.selectedTemplate ? state.selectedTemplate.template_name : undefined,
-          template_key: state.selectedTemplate ? state.selectedTemplate.template_key : undefined,
-          confirm_text: document.getElementById('confirmText').value.trim(),
-          reply_email: document.getElementById('replyEmail').value.trim(),
-          subject: document.getElementById('subjectOverride').value.trim() || undefined,
-          bcc_email: document.getElementById('bccEmail').value.trim() || undefined,
-          campaign_text: document.getElementById('campaignText').value.trim() || '',
-        };
-        const data = await callFunction(url, payload);
-        state.sendResponse = data;
-        document.getElementById('sendResult').textContent = JSON.stringify(data, null, 2);
-        renderFinalResult();
-      } catch (error) {
-        document.getElementById('sendResult').textContent = error.message;
-      }
-    }
-
-    function renderFinalResult() {
-      if (!state.sendResponse) {
-        document.getElementById('resultSummary').className = 'notice';
-        document.getElementById('resultSummary').textContent = 'まだ結果がありません。';
+      if (!selectedTemplate) {
+        showAppAlert("先にテンプレートを選択してください。", "warn");
         return;
       }
-      const d = state.sendResponse;
-      document.getElementById('resultSummary').className = 'notice good';
-      document.getElementById('resultSummary').innerHTML = `
-        <strong>送信完了</strong><br>
-        成功：${escapeHtml(d.sent_count || 0)}件 / 失敗：${escapeHtml(d.failed_count || 0)}件 / スキップ：${escapeHtml(d.skipped_count || 0)}件<br>
-        final_status：${escapeHtml(d.final_status || '-')}
-      `;
-      document.getElementById('resultTableArea').innerHTML = renderResultsTable(d.results || []);
+      const testEmail = el("testEmail").value.trim();
+      if (!testEmail) {
+        showAppAlert("テスト送信先を入力してください。", "warn");
+        return;
+      }
+      const done = setLoading(el("sendTestButton"), "送信中...");
+      hideAppAlert();
+      try {
+        const settings = loadSettings();
+        const response = await callFunction(settings.functions.sendTestEmail, {
+          resend_template_id: selectedTemplate.resend_template_id,
+          template_name: selectedTemplate.template_name,
+          test_email: testEmail,
+          customer_name: el("testCustomerName").value.trim() || "テスト太郎"
+        });
+        renderJson("testResultBox", response);
+        showAppAlert("テスト送信しました。メールボックスを確認してください。", "ok");
+      } catch (error) {
+        showAppAlert(`テスト送信に失敗しました：${error.message}`, "danger");
+        renderJson("testResultBox", error.response || { error: error.message });
+      } finally {
+        done();
+      }
     }
 
-    function renderRecordsTable(records, caption) {
-      if (!records.length) return `${escapeHtml(caption)}<br><br>表示するデータはありません。`;
-      return `
-        <div style="margin-bottom:10px;">${escapeHtml(caption)}</div>
-        <table>
-          <thead><tr><th>名前</th><th>メール</th><th>店舗</th><th>対象日</th><th>メモ</th></tr></thead>
-          <tbody>
-            ${records.map(r => `
-              <tr>
-                <td>${escapeHtml(r.name || '')}</td>
-                <td>${escapeHtml(r.email || '')}</td>
-                <td>${escapeHtml(r.store_name || '')}</td>
-                <td>${escapeHtml(r.target_date || r.trial_date || '')}</td>
-                <td>${escapeHtml(r.notes || r.churn_reason || '')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
+    async function readFileText(file) {
+      if (!file) return "";
+      return await file.text();
     }
 
-    function renderResultsTable(results) {
-      if (!results.length) return '<div class="notice">結果データがありません。</div>';
-      return `
-        <table>
-          <thead><tr><th>状態</th><th>名前</th><th>メール</th><th>店舗</th><th>Resend ID</th><th>配信停止URL</th></tr></thead>
-          <tbody>
-            ${results.map(r => `
-              <tr>
-                <td><span class="badge ${r.status === 'sent' ? 'good' : r.status === 'failed' ? 'bad' : 'warn'}">${escapeHtml(r.status || '')}</span></td>
-                <td>${escapeHtml(r.name || '')}</td>
-                <td>${escapeHtml(r.email || '')}</td>
-                <td>${escapeHtml(r.store_name || '')}</td>
-                <td>${escapeHtml(r.resend_email_id || '')}</td>
-                <td>${r.unsubscribe_url ? `<a style="color:#bfdbfe;" href="${escapeAttr(r.unsubscribe_url)}" target="_blank">確認</a>` : ''}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
+    async function parseCsv() {
+      const file = el("csvFile").files?.[0] || null;
+      const fileText = await readFileText(file);
+      const pastedText = el("csvText").value || "";
+      const combinedText = `${fileText}\n${pastedText}`;
+      const extracted = extractEmailsFromText(combinedText);
+      parsedEmails = unique(extracted);
+      updateStatsFromParsed(extracted.length, parsedEmails.length);
+      renderEmailPreview();
+      if (parsedEmails.length) {
+        showAppAlert(`メールアドレスを ${parsedEmails.length} 件読み込みました。`, "ok");
+      } else {
+        showAppAlert("メールアドレスが見つかりませんでした。", "warn");
+      }
     }
 
-    function resetWizard() {
-      const ok = confirm('入力内容をリセットしますか？');
-      if (!ok) return;
-      state.currentStep = 0;
-      state.selectedTemplate = null;
-      state.rawRecords = [];
-      state.checkedRecords = [];
-      state.excludedRecords = [];
-      state.batch = null;
-      state.createBatchResponse = null;
-      state.sendResponse = null;
-      document.getElementById('listText').value = '';
-      document.getElementById('listPreviewArea').className = 'notice';
-      document.getElementById('listPreviewArea').textContent = 'リスト未確認です。';
-      document.getElementById('suppressionStats').innerHTML = '';
-      document.getElementById('suppressionResultArea').className = 'notice';
-      document.getElementById('suppressionResultArea').textContent = 'まだ照合していません。';
-      document.getElementById('batchInfo').className = 'notice';
-      document.getElementById('batchInfo').textContent = 'まだ送信対象を作成していません。';
-      document.getElementById('testResult').textContent = 'まだ実行していません。';
-      document.getElementById('sendResult').textContent = 'まだ実行していません。';
-      renderFinalResult();
-      openStep(0);
+    function clearCsv() {
+      el("csvFile").value = "";
+      el("csvFileName").textContent = "ファイル未選択";
+      el("csvText").value = "";
+      parsedEmails = [];
+      updateStatsFromParsed(0, 0);
+      renderEmailPreview();
+      el("batchNotice").className = "notice notice-warn";
+      el("batchNotice").textContent = "まだ送信対象は作成されていません。";
+      el("batchResultBox").classList.add("hidden");
     }
 
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    async function createBatch() {
+      if (!selectedTemplate) {
+        showAppAlert("先にテンプレートを選択してください。", "warn");
+        return;
+      }
+      if (!parsedEmails.length) {
+        showAppAlert("先にCSVからメールアドレスを読み込んでください。", "warn");
+        return;
+      }
+      const done = setLoading(el("createBatchButton"), "作成中...");
+      hideAppAlert();
+      try {
+        const settings = loadSettings();
+        const response = await callFunction(settings.functions.createSendBatch, {
+          resend_template_id: selectedTemplate.resend_template_id,
+          template_name: selectedTemplate.template_name,
+          emails: parsedEmails
+        });
+        currentBatchId = response.batch_id || "";
+        el("batchIdInput").value = currentBatchId;
+        updateStatsFromBatch(response.counts || {});
+        const notice = el("batchNotice");
+        notice.className = "notice notice-ok";
+        notice.textContent = `送信対象を作成しました。batch_id: ${currentBatchId}`;
+        renderJson("batchResultBox", response);
+        showAppAlert("送信対象を作成しました。次に dry run を実行してください。", "ok");
+      } catch (error) {
+        showAppAlert(`送信対象作成に失敗しました：${error.message}`, "danger");
+        renderJson("batchResultBox", error.response || { error: error.message });
+      } finally {
+        done();
+      }
     }
 
-    function escapeAttr(value) {
-      return escapeHtml(value).replaceAll('`', '&#096;');
+    async function dryRun() {
+      const batchId = el("batchIdInput").value.trim();
+      if (!batchId) {
+        showAppAlert("batch_id がありません。先に送信対象を作成してください。", "warn");
+        return;
+      }
+      const done = setLoading(el("dryRunButton"), "確認中...");
+      hideAppAlert();
+      try {
+        const settings = loadSettings();
+        const response = await callFunction(settings.functions.sendApprovedBatch, {
+          batch_id: batchId,
+          dry_run: true
+        });
+        renderJson("sendResultBox", response);
+        showAppAlert("dry run が完了しました。結果を確認してください。", "ok");
+      } catch (error) {
+        showAppAlert(`dry run に失敗しました：${error.message}`, "danger");
+        renderJson("sendResultBox", error.response || { error: error.message });
+      } finally {
+        done();
+      }
     }
+
+    async function sendApprovedBatch(forceLimit) {
+      const batchId = el("batchIdInput").value.trim();
+      if (!batchId) {
+        showAppAlert("batch_id がありません。先に送信対象を作成してください。", "warn");
+        return;
+      }
+      if (!el("confirmSendCheckbox").checked) {
+        showAppAlert("本送信前の確認チェックを入れてください。", "warn");
+        return;
+      }
+      const limitValue = forceLimit || Number(el("sendLimit").value || 1);
+      const limit = Math.min(Math.max(Number(limitValue) || 1, 1), 500);
+      const button = forceLimit === 500 ? el("sendAllButton") : el("sendOneButton");
+      const done = setLoading(button, "送信中...");
+      hideAppAlert();
+      try {
+        const settings = loadSettings();
+        const response = await callFunction(settings.functions.sendApprovedBatch, {
+          batch_id: batchId,
+          limit
+        });
+        renderJson("sendResultBox", response);
+        showAppAlert(`本送信が完了しました。送信: ${response.sent_count || 0}件 / 失敗: ${response.failed_count || 0}件`, "ok");
+        el("confirmSendCheckbox").checked = false;
+      } catch (error) {
+        showAppAlert(`本送信に失敗しました：${error.message}`, "danger");
+        renderJson("sendResultBox", error.response || { error: error.message });
+      } finally {
+        done();
+      }
+    }
+
+    function bindEvents() {
+      el("settingsToggle").addEventListener("click", () => {
+        el("settingsContent").classList.toggle("hidden");
+      });
+
+      el("openSettingsButton").addEventListener("click", () => {
+        showLoginView();
+        el("settingsContent").classList.remove("hidden");
+      });
+
+      el("saveSettingsButton").addEventListener("click", () => {
+        const settings = getSettingsFromForm();
+        saveSettings(settings);
+        initSupabase();
+        showLoginAlert("設定を保存しました。", "ok");
+      });
+
+      el("loginButton").addEventListener("click", login);
+      el("loginPassword").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") login();
+      });
+      el("logoutButton").addEventListener("click", logout);
+      el("loadTemplatesButton").addEventListener("click", loadTemplates);
+      el("sendTestButton").addEventListener("click", sendTestEmail);
+      el("parseCsvButton").addEventListener("click", parseCsv);
+      el("clearCsvButton").addEventListener("click", clearCsv);
+      el("createBatchButton").addEventListener("click", createBatch);
+      el("dryRunButton").addEventListener("click", dryRun);
+      el("sendOneButton").addEventListener("click", () => sendApprovedBatch());
+      el("sendAllButton").addEventListener("click", () => sendApprovedBatch(500));
+
+      el("csvFile").addEventListener("change", () => {
+        const file = el("csvFile").files?.[0];
+        el("csvFileName").textContent = file ? `選択中：${file.name}` : "ファイル未選択";
+      });
+    }
+
+    async function main() {
+      fillSettingsForm();
+      bindEvents();
+      const hasClient = initSupabase();
+      if (!hasClient) {
+        showLoginView();
+        showLoginAlert("初回は初期設定を開いて anon public key を保存してください。", "warn");
+        el("settingsContent").classList.remove("hidden");
+        return;
+      }
+      try {
+        await bootApp();
+      } catch {
+        showLoginView();
+      }
+    }
+
+    main();
   </script>
 </body>
 </html>
