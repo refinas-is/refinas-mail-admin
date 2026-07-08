@@ -9,27 +9,29 @@
     :root {
       --bg: #f7f7f8;
       --panel: #ffffff;
-      --text: #101114;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --border-dark: #d1d5db;
+      --text: #121212;
+      --muted: #6f6f76;
+      --border: #e6e6e8;
+      --border-strong: #d3d3d7;
       --black: #111111;
-      --black-hover: #2a2a2a;
-      --danger: #b42318;
-      --danger-bg: #fff1f0;
-      --ok: #067647;
-      --ok-bg: #ecfdf3;
-      --warn: #b54708;
-      --warn-bg: #fffaeb;
-      --radius: 16px;
-      --shadow: 0 20px 60px rgba(16, 17, 20, 0.08);
+      --soft: #f1f1f3;
+      --success-bg: #eefbf3;
+      --success-border: #b9e8c9;
+      --success-text: #176a35;
+      --warn-bg: #fff8e8;
+      --warn-border: #f0d69a;
+      --warn-text: #7a5615;
+      --error-bg: #fff0f0;
+      --error-border: #f0bbbb;
+      --error-text: #8a1f1f;
+      --radius: 18px;
+      --shadow: 0 20px 50px rgba(0,0,0,.06);
     }
 
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
@@ -40,29 +42,92 @@
     }
 
     button {
+      border: none;
       cursor: pointer;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-weight: 700;
+      transition: .15s ease;
+      white-space: nowrap;
+    }
+
+    button.primary {
+      background: var(--black);
+      color: #fff;
+    }
+
+    button.secondary {
+      background: #fff;
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+    }
+
+    button.danger {
+      background: #8a1f1f;
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 3px rgba(0,0,0,.08);
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      word-break: break-all;
     }
 
     .hidden { display: none !important; }
 
     .login-wrap {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
       padding: 24px;
-      background:
-        radial-gradient(circle at top left, rgba(0,0,0,0.08), transparent 28%),
-        linear-gradient(180deg, #ffffff 0%, #f6f6f6 100%);
     }
 
     .login-card {
-      width: min(460px, 100%);
+      width: min(480px, 100%);
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 24px;
+      border-radius: 26px;
+      padding: 30px;
       box-shadow: var(--shadow);
-      padding: 32px;
     }
 
     .brand {
@@ -76,217 +141,48 @@
       width: 38px;
       height: 38px;
       border-radius: 12px;
+      display: grid;
+      place-items: center;
       background: #111;
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      letter-spacing: -0.04em;
+      font-weight: 900;
+      letter-spacing: -.06em;
     }
 
     .brand-title {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -.04em;
     }
 
-    .brand-subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: -2px;
+    .form-stack {
+      display: grid;
+      gap: 16px;
     }
 
-    .login-card h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-      line-height: 1.25;
-      letter-spacing: -0.04em;
-    }
-
-    .login-card p {
-      margin: 0 0 24px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .field {
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 650;
-      color: #343740;
-      margin-bottom: 8px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      border: 1px solid var(--border-dark);
-      border-radius: 12px;
-      background: #fff;
-      color: var(--text);
-      padding: 11px 12px;
-      outline: none;
-      transition: border-color .15s, box-shadow .15s;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      border-color: #111;
-      box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
-    }
-
-    textarea {
-      min-height: 132px;
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 13px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-weight: 700;
-      line-height: 1.3;
-      background: #fff;
-      color: #111;
-      border-color: var(--border-dark);
-    }
-
-    .btn:hover { background: #f9fafb; }
-
-    .btn-primary {
-      background: var(--black);
-      color: #fff;
-      border-color: var(--black);
-    }
-
-    .btn-primary:hover {
-      background: var(--black-hover);
-    }
-
-    .btn-danger {
-      color: var(--danger);
-      border-color: #f2b8b5;
-      background: #fff;
-    }
-
-    .btn-danger:hover {
-      background: var(--danger-bg);
-    }
-
-    .btn-wide { width: 100%; }
-
-    .btn:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-    .settings-box {
-      border: 1px dashed var(--border-dark);
-      border-radius: 16px;
-      padding: 14px;
-      background: #fafafa;
-      margin-top: 18px;
-    }
-
-    .settings-toggle {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      background: transparent;
-      border: 0;
-      padding: 0;
-      font-weight: 700;
-      color: #222;
-      text-align: left;
-    }
-
-    .settings-content {
-      margin-top: 14px;
-    }
-
-    .app-shell {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    .app {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px;
     }
 
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 24px;
-    }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+      margin-bottom: 24px;
     }
 
     .user-pill {
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 12px;
-      max-width: 280px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .main {
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      padding: 28px 20px 52px;
-    }
-
-    .hero {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 24px;
-      margin-bottom: 22px;
-    }
-
-    .hero h1 {
-      margin: 0 0 6px;
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing: -0.06em;
-      line-height: 1.08;
-    }
-
-    .hero p {
-      margin: 0;
-      color: var(--muted);
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 10px 8px 14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.04);
     }
 
     .grid {
@@ -295,1011 +191,1015 @@
       gap: 18px;
     }
 
+    @media (min-width: 960px) {
+      .grid.two { grid-template-columns: 1fr 1fr; }
+    }
+
     .card {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: 0 8px 30px rgba(16, 17, 20, 0.04);
-      overflow: hidden;
+      padding: 22px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.035);
     }
 
-    .card-header {
+    .section-title {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 16px;
-      padding: 20px 20px 14px;
-      border-bottom: 1px solid var(--border);
+      gap: 14px;
+      margin-bottom: 16px;
     }
 
-    .card-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .section-title h2 {
       margin: 0;
       font-size: 18px;
-      letter-spacing: -0.02em;
+      letter-spacing: -.02em;
     }
 
-    .step-badge {
-      flex: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      background: #111;
-      color: #fff;
+    .step {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #111;
+      color: #fff;
       font-size: 13px;
       font-weight: 800;
-    }
-
-    .card-desc {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .card-body {
-      padding: 20px;
+      margin-right: 8px;
     }
 
     .row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .row-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .actions {
       display: flex;
-      flex-wrap: wrap;
+      gap: 12px;
       align-items: center;
-      gap: 10px;
-      margin-top: 14px;
+      flex-wrap: wrap;
     }
 
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 14px;
-    }
+    .row > * { flex: 1; }
+    .row .fit { flex: 0 0 auto; }
 
-    .stat {
-      border: 1px solid var(--border);
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
       border-radius: 14px;
-      padding: 12px;
-      background: #fbfbfb;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-x: auto;
     }
 
-    .stat-label {
+    .status.success {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success-text);
+    }
+
+    .status.warn {
+      background: var(--warn-bg);
+      border-color: var(--warn-border);
+      color: var(--warn-text);
+    }
+
+    .status.error {
+      background: var(--error-bg);
+      border-color: var(--error-border);
+      color: var(--error-text);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (min-width: 740px) {
+      .metrics { grid-template-columns: repeat(5, 1fr); }
+    }
+
+    .metric {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .metric .num {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1.1;
+    }
+
+    .metric .label {
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
-    .notice {
-      border-radius: 14px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      background: #fbfbfb;
-      color: #343740;
-      font-size: 13px;
-      margin-top: 14px;
-    }
-
-    .notice-ok {
-      border-color: #abefc6;
-      background: var(--ok-bg);
-      color: var(--ok);
-    }
-
-    .notice-warn {
-      border-color: #fedf89;
-      background: var(--warn-bg);
-      color: var(--warn);
-    }
-
-    .notice-danger {
-      border-color: #fda29b;
-      background: var(--danger-bg);
-      color: var(--danger);
+      margin-top: 4px;
     }
 
     .template-list {
       display: grid;
       gap: 10px;
-      max-height: 260px;
+      max-height: 340px;
       overflow: auto;
       padding-right: 4px;
     }
 
     .template-item {
-      width: 100%;
-      text-align: left;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
       background: #fff;
-      display: grid;
-      gap: 3px;
+      border-radius: 15px;
+      padding: 13px 14px;
+      cursor: pointer;
+      transition: .15s ease;
     }
 
-    .template-item:hover,
+    .template-item:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
     .template-item.active {
       border-color: #111;
-      box-shadow: 0 0 0 4px rgba(17,17,17,0.06);
+      box-shadow: 0 0 0 3px rgba(0,0,0,.08);
     }
 
     .template-name {
       font-weight: 800;
     }
 
-    .template-meta {
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--soft);
       color: var(--muted);
       font-size: 12px;
-      overflow-wrap: anywhere;
+      font-weight: 700;
     }
 
     .preview-list {
-      display: grid;
-      gap: 8px;
-      max-height: 180px;
+      margin-top: 12px;
+      max-height: 160px;
       overflow: auto;
       border: 1px solid var(--border);
       border-radius: 14px;
+      background: #fff;
       padding: 10px;
-      background: #fbfbfb;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       font-size: 13px;
     }
 
-    .preview-email {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 7px;
+    .preview-list div {
+      padding: 4px 2px;
+      border-bottom: 1px solid #f1f1f1;
     }
 
-    .preview-email:last-child {
-      border-bottom: 0;
-      padding-bottom: 0;
-    }
+    .preview-list div:last-child { border-bottom: none; }
 
-    .result-box {
-      white-space: pre-wrap;
-      overflow: auto;
-      max-height: 360px;
-      background: #0f1115;
-      color: #e5e7eb;
-      border-radius: 14px;
-      padding: 14px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 12px;
+    details {
       margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: #fff;
     }
 
-    .small {
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    pre {
+      margin: 12px 0 0;
+      white-space: pre-wrap;
+      word-break: break-word;
       font-size: 12px;
-      color: var(--muted);
-    }
-
-    .checkbox-line {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-top: 12px;
-      font-size: 13px;
-      color: #343740;
-    }
-
-    .checkbox-line input {
-      width: auto;
-      margin-top: 4px;
-    }
-
-    @media (max-width: 820px) {
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .topbar-right {
-        justify-content: flex-start;
-      }
-
-      .hero {
-        flex-direction: column;
-      }
-
-      .row,
-      .row-3,
-      .stat-grid {
-        grid-template-columns: 1fr;
-      }
+      background: #f6f6f7;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      overflow: auto;
     }
   </style>
 </head>
 <body>
-  <section id="loginView" class="login-wrap">
+  <div id="loginView" class="login-wrap hidden">
     <div class="login-card">
       <div class="brand">
         <div class="brand-mark">R</div>
         <div>
           <div class="brand-title">REFINAS Mail</div>
-          <div class="brand-subtitle">メール配信管理画面</div>
+          <div class="small">メール配信管理画面</div>
         </div>
       </div>
 
-      <h1>ログイン</h1>
-      <p>管理者アカウントでログインしてください。</p>
-
-      <div id="loginAlert" class="notice notice-warn hidden"></div>
-
-      <div class="field">
-        <label for="loginEmail">メールアドレス</label>
-        <input id="loginEmail" type="email" autocomplete="email" placeholder="refinas.ads@gmail.com" />
-      </div>
-
-      <div class="field">
-        <label for="loginPassword">パスワード</label>
-        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="パスワード" />
-      </div>
-
-      <button id="loginButton" class="btn btn-primary btn-wide" type="button">ログイン</button>
-
-      <div class="settings-box">
-        <button id="settingsToggle" class="settings-toggle" type="button">
-          <span>初期設定を開く</span>
-          <span>＋</span>
-        </button>
-        <div id="settingsContent" class="settings-content hidden">
-          <div class="field">
-            <label for="settingSupabaseUrl">Supabase URL</label>
-            <input id="settingSupabaseUrl" type="text" />
-          </div>
-          <div class="field">
-            <label for="settingAnonKey">Supabase anon public key</label>
-            <textarea id="settingAnonKey" placeholder="anon public keyを貼り付け"></textarea>
-            <div class="small">service_role key は絶対に入れないでください。</div>
-          </div>
-          <button id="saveSettingsButton" class="btn" type="button">設定を保存</button>
+      <div class="form-stack">
+        <div>
+          <label for="loginEmail">メールアドレス</label>
+          <input id="loginEmail" type="email" autocomplete="email" placeholder="refinas.ads@gmail.com" />
         </div>
+        <div>
+          <label for="loginPassword">パスワード</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="パスワード" />
+        </div>
+        <button id="loginButton" class="primary">ログイン</button>
+
+        <details id="setupDetails">
+          <summary>初期設定を開く</summary>
+          <div style="margin-top:14px" class="form-stack">
+            <div>
+              <label for="anonKeyInput">Supabase anon public key</label>
+              <input id="anonKeyInput" type="password" placeholder="eyJhbGciOi..." />
+              <div class="small" style="margin-top:8px">service_role key は絶対に入れないでください。</div>
+            </div>
+            <button id="saveConfigButton" class="secondary" type="button">設定を保存</button>
+          </div>
+        </details>
+
+        <div id="loginStatus" class="status hidden"></div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section id="appView" class="app-shell hidden">
-    <header class="topbar">
-      <div class="topbar-left">
+  <main id="appView" class="app hidden">
+    <div class="topbar">
+      <div class="brand">
         <div class="brand-mark">R</div>
         <div>
           <div class="brand-title">REFINAS Mail</div>
-          <div class="brand-subtitle">CSVメール配信管理</div>
+          <div class="small">CSVはメールアドレスだけ。配信停止除外は自動で実施します。</div>
         </div>
       </div>
-      <div class="topbar-right">
-        <span id="currentUser" class="user-pill"></span>
-        <button id="openSettingsButton" class="btn" type="button">設定</button>
-        <button id="logoutButton" class="btn" type="button">ログアウト</button>
+      <div class="user-pill">
+        <span id="currentUserEmail" class="small"></span>
+        <button id="logoutButton" class="secondary" type="button">ログアウト</button>
       </div>
-    </header>
+    </div>
 
-    <main class="main">
-      <div class="hero">
+    <div class="grid two">
+      <section class="card">
+        <div class="section-title">
+          <div>
+            <h2><span class="step">1</span>テンプレート選択</h2>
+            <div class="small">Resendからテンプレート一覧を取得します。</div>
+          </div>
+          <button id="loadTemplatesButton" class="primary fit" type="button">テンプレート読み込み</button>
+        </div>
+        <div id="selectedTemplateBox" class="status warn">テンプレート未選択です。</div>
+        <div id="templateList" class="template-list" style="margin-top:14px"></div>
+        <div id="templateStatus" class="status hidden"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div>
+            <h2><span class="step">2</span>テスト送信</h2>
+            <div class="small">選択したResendテンプレートでテストメールを送ります。</div>
+          </div>
+        </div>
+        <div class="form-stack">
+          <div>
+            <label for="testEmailInput">テスト送信先</label>
+            <input id="testEmailInput" type="email" placeholder="refinas.ads@gmail.com" />
+          </div>
+          <button id="sendTestButton" class="primary" type="button" disabled>テスト送信</button>
+          <div id="testStatus" class="status hidden"></div>
+        </div>
+      </section>
+    </div>
+
+    <div style="height:18px"></div>
+
+    <section class="card">
+      <div class="section-title">
         <div>
-          <h1>メールアドレスだけで配信</h1>
-          <p>Resendテンプレートを選び、CSVのメールアドレスだけを読み込んで、本送信まで進めます。</p>
+          <h2><span class="step">3</span>CSV読み込み</h2>
+          <div class="small">メールアドレスだけでOKです。ヘッダーあり・なし、どちらも対応します。</div>
+        </div>
+        <span class="pill">配信停止除外は次のステップで自動</span>
+      </div>
+
+      <div class="grid two">
+        <div class="form-stack">
+          <div>
+            <label for="csvFileInput">CSVファイル</label>
+            <input id="csvFileInput" type="file" accept=".csv,text/csv,text/plain" />
+          </div>
+          <div>
+            <label for="csvTextInput">直接貼り付け</label>
+            <textarea id="csvTextInput" placeholder="email&#10;refinas.ads@gmail.com"></textarea>
+          </div>
+          <div class="row">
+            <button id="parseCsvButton" class="secondary fit" type="button">メールアドレス確認</button>
+            <button id="clearCsvButton" class="secondary fit" type="button">クリア</button>
+          </div>
+        </div>
+        <div>
+          <div class="metrics">
+            <div class="metric">
+              <div id="localTotalCount" class="num">0</div>
+              <div class="label">候補</div>
+            </div>
+            <div class="metric">
+              <div id="localValidCount" class="num">0</div>
+              <div class="label">有効形式</div>
+            </div>
+            <div class="metric">
+              <div id="localInvalidCount" class="num">0</div>
+              <div class="label">不正形式</div>
+            </div>
+            <div class="metric">
+              <div id="localDuplicateCount" class="num">0</div>
+              <div class="label">重複</div>
+            </div>
+            <div class="metric">
+              <div id="localUniqueCount" class="num">0</div>
+              <div class="label">重複除外後</div>
+            </div>
+          </div>
+          <div id="emailPreview" class="preview-list hidden"></div>
+          <div id="csvStatus" class="status hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <div style="height:18px"></div>
+
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <h2><span class="step">4</span>送信対象作成</h2>
+          <div class="small">ここでメール形式チェック・重複除外・配信停止リスト除外を自動で行います。</div>
+        </div>
+        <button id="createBatchButton" class="primary fit" type="button" disabled>送信対象を作成</button>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div id="batchTotalCount" class="num">0</div>
+          <div class="label">読み込み件数</div>
+        </div>
+        <div class="metric">
+          <div id="batchValidCount" class="num">0</div>
+          <div class="label">送信対象</div>
+        </div>
+        <div class="metric">
+          <div id="batchSuppressedCount" class="num">0</div>
+          <div class="label">配信停止除外</div>
+        </div>
+        <div class="metric">
+          <div id="batchInvalidCount" class="num">0</div>
+          <div class="label">不正メール</div>
+        </div>
+        <div class="metric">
+          <div id="batchDuplicateCount" class="num">0</div>
+          <div class="label">重複除外</div>
         </div>
       </div>
 
-      <div id="appAlert" class="notice hidden"></div>
+      <div id="batchStatus" class="status warn">まだ送信対象は作成されていません。</div>
+      <details id="batchRawDetails" class="hidden">
+        <summary>送信対象作成レスポンス</summary>
+        <pre id="batchRaw"></pre>
+      </details>
+    </section>
 
-      <div class="grid">
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title"><span class="step-badge">1</span>テンプレート選択</h2>
-              <p class="card-desc">Resendからテンプレート一覧を取得します。</p>
-            </div>
-            <button id="loadTemplatesButton" class="btn btn-primary" type="button">テンプレート読み込み</button>
-          </div>
-          <div class="card-body">
-            <div id="selectedTemplateNotice" class="notice notice-warn">まだテンプレートが選択されていません。</div>
-            <div id="templateList" class="template-list"></div>
-            <div id="templateRawBox" class="result-box hidden"></div>
-          </div>
-        </section>
+    <div style="height:18px"></div>
 
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title"><span class="step-badge">2</span>テスト送信</h2>
-              <p class="card-desc">選択したResendテンプレートで、先にテストメールを送ります。</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="field">
-                <label for="testEmail">テスト送信先</label>
-                <input id="testEmail" type="email" value="refinas.ads@gmail.com" />
-              </div>
-              <div class="field">
-                <label for="testCustomerName">テスト用の名前</label>
-                <input id="testCustomerName" type="text" value="テスト太郎" />
-              </div>
-            </div>
-            <div class="actions">
-              <button id="sendTestButton" class="btn btn-primary" type="button">テスト送信</button>
-            </div>
-            <div id="testResultBox" class="result-box hidden"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title"><span class="step-badge">3</span>CSV読み込み</h2>
-              <p class="card-desc">CSVはメールアドレスだけでOKです。ヘッダーあり・なし両方対応します。</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="field">
-                <label for="csvFile">CSVファイル</label>
-                <input id="csvFile" type="file" accept=".csv,text/csv,text/plain" />
-                <div id="csvFileName" class="small">ファイル未選択</div>
-              </div>
-              <div class="field">
-                <label for="csvText">直接貼り付け</label>
-                <textarea id="csvText" placeholder="email&#10;sample1@example.com&#10;sample2@example.com"></textarea>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button id="parseCsvButton" class="btn btn-primary" type="button">メールアドレスを読み込む</button>
-              <button id="clearCsvButton" class="btn" type="button">クリア</button>
-            </div>
-
-            <div class="stat-grid">
-              <div class="stat">
-                <div class="stat-label">抽出メール</div>
-                <div id="statExtracted" class="stat-value">0</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">重複削除後</div>
-                <div id="statUnique" class="stat-value">0</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">バッチ送信OK</div>
-                <div id="statValid" class="stat-value">-</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">配信停止除外</div>
-                <div id="statSuppressed" class="stat-value">-</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">不正・重複</div>
-                <div id="statInvalidDuplicate" class="stat-value">-</div>
-              </div>
-            </div>
-
-            <div class="notice notice-warn">読み込まれたメールアドレスだけを送信対象にします。名前・店舗名などの列は使いません。</div>
-            <div id="emailPreview" class="preview-list hidden"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title"><span class="step-badge">4</span>送信対象作成</h2>
-              <p class="card-desc">重複・配信停止を除外して、送信用バッチを作成します。</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="actions">
-              <button id="createBatchButton" class="btn btn-primary" type="button">送信対象を作成</button>
-            </div>
-            <div id="batchNotice" class="notice notice-warn">まだ送信対象は作成されていません。</div>
-            <div id="batchResultBox" class="result-box hidden"></div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title"><span class="step-badge">5</span>本送信</h2>
-              <p class="card-desc">最初は必ず dry run、次に limit: 1 で確認してください。</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="row-3">
-              <div class="field">
-                <label for="batchIdInput">batch_id</label>
-                <input id="batchIdInput" type="text" placeholder="送信対象作成後に自動入力" />
-              </div>
-              <div class="field">
-                <label for="sendLimit">送信上限 limit</label>
-                <input id="sendLimit" type="number" min="1" max="500" value="1" />
-              </div>
-              <div class="field">
-                <label for="sendModeMemo">推奨手順</label>
-                <input id="sendModeMemo" type="text" value="dry run → limit 1 → 本送信" disabled />
-              </div>
-            </div>
-
-            <div class="actions">
-              <button id="dryRunButton" class="btn" type="button">dry run確認</button>
-            </div>
-
-            <label class="checkbox-line">
-              <input id="confirmSendCheckbox" type="checkbox" />
-              <span>dry runの結果を確認しました。本送信を実行します。</span>
-            </label>
-
-            <div class="actions">
-              <button id="sendOneButton" class="btn btn-primary" type="button">limitの件数だけ本送信</button>
-              <button id="sendAllButton" class="btn btn-danger" type="button">最大500件を本送信</button>
-            </div>
-
-            <div class="notice notice-danger">本送信ボタンを押すと実際にメールが送信されます。まずは limit を 1 にしてください。</div>
-            <div id="sendResultBox" class="result-box hidden"></div>
-          </div>
-        </section>
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <h2><span class="step">5</span>dry run確認</h2>
+          <div class="small">メールは送らず、送信予定だけ確認します。</div>
+        </div>
+        <button id="dryRunButton" class="secondary fit" type="button" disabled>dry run</button>
       </div>
-    </main>
-  </section>
+      <div id="dryRunStatus" class="status warn">送信対象作成後に実行できます。</div>
+      <details id="dryRunRawDetails" class="hidden">
+        <summary>dry runレスポンス</summary>
+        <pre id="dryRunRaw"></pre>
+      </details>
+    </section>
+
+    <div style="height:18px"></div>
+
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <h2><span class="step">6</span>本送信</h2>
+          <div class="small">最初は必ず1件で確認してください。送信成功は sent_count / failed_count で判定します。</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="sendLimitInput">今回送信する最大件数</label>
+          <input id="sendLimitInput" type="number" min="1" max="500" value="1" />
+        </div>
+        <div class="fit" style="align-self:end">
+          <button id="sendBatchButton" class="danger" type="button" disabled>本送信する</button>
+        </div>
+      </div>
+
+      <div id="sendStatus" class="status warn">dry run確認後に本送信できます。</div>
+      <details id="sendRawDetails" class="hidden">
+        <summary>本送信レスポンス</summary>
+        <pre id="sendRaw"></pre>
+      </details>
+    </section>
+  </main>
 
   <script>
-    const DEFAULT_SUPABASE_URL = "https://gusxlxuosndznwhrcgnh.supabase.co";
-    const STORAGE_KEY = "refinas_mail_admin_v4";
+    const SUPABASE_URL = "https://gusxlxuosndznwhrcgnh.supabase.co";
+    const STORAGE_KEY = "refinas_mail_admin_config_v3";
 
     let supabaseClient = null;
     let currentSession = null;
+    let currentTemplates = [];
     let selectedTemplate = null;
-    let parsedEmails = [];
-    let currentBatchId = "";
+    let emailCandidates = [];
+    let currentBatchId = null;
+    let currentBatchCounts = null;
+    let dryRunOk = false;
 
-    const el = (id) => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-    function getDefaultSettings() {
-      const supabaseUrl = DEFAULT_SUPABASE_URL;
-      return {
-        supabaseUrl,
-        anonKey: "",
-        functions: {
-          getResendTemplates: `${supabaseUrl}/functions/v1/get-resend-templates`,
-          sendTestEmail: `${supabaseUrl}/functions/v1/send-test-email`,
-          createSendBatch: `${supabaseUrl}/functions/v1/create-send-batch`,
-          sendApprovedBatch: `${supabaseUrl}/functions/v1/send-approved-batch`
-        }
-      };
+    function show(el, visible = true) {
+      el.classList.toggle("hidden", !visible);
     }
 
-    function loadSettings() {
-      const defaults = getDefaultSettings();
+    function setStatus(id, message, type = "") {
+      const el = $(id);
+      el.textContent = message;
+      el.className = "status" + (type ? " " + type : "");
+      show(el, true);
+    }
+
+    function hideStatus(id) {
+      const el = $(id);
+      show(el, false);
+    }
+
+    function pretty(value) {
+      return JSON.stringify(value, null, 2);
+    }
+
+    function loadConfig() {
       try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-        return {
-          ...defaults,
-          ...saved,
-          functions: {
-            ...defaults.functions,
-            ...(saved.functions || {})
-          }
-        };
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       } catch {
-        return defaults;
+        return {};
       }
     }
 
-    function saveSettings(settings) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    function saveConfig(config) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
     }
 
-    function fillSettingsForm() {
-      const settings = loadSettings();
-      el("settingSupabaseUrl").value = settings.supabaseUrl || DEFAULT_SUPABASE_URL;
-      el("settingAnonKey").value = settings.anonKey || "";
+    function getAnonKey() {
+      return loadConfig().anonKey || "";
     }
 
-    function getSettingsFromForm() {
-      const supabaseUrl = el("settingSupabaseUrl").value.trim() || DEFAULT_SUPABASE_URL;
-      const anonKey = el("settingAnonKey").value.trim();
-      return {
-        supabaseUrl,
-        anonKey,
-        functions: {
-          getResendTemplates: `${supabaseUrl}/functions/v1/get-resend-templates`,
-          sendTestEmail: `${supabaseUrl}/functions/v1/send-test-email`,
-          createSendBatch: `${supabaseUrl}/functions/v1/create-send-batch`,
-          sendApprovedBatch: `${supabaseUrl}/functions/v1/send-approved-batch`
-        }
-      };
-    }
-
-    function initSupabase() {
-      const settings = loadSettings();
-      if (!settings.supabaseUrl || !settings.anonKey) {
-        supabaseClient = null;
+    function initSupabaseClient() {
+      const anonKey = getAnonKey();
+      if (!anonKey) return false;
+      if (!window.supabase) {
+        setStatus("loginStatus", "Supabase JSの読み込みに失敗しました。インターネット接続を確認してください。", "error");
         return false;
       }
-      supabaseClient = window.supabase.createClient(settings.supabaseUrl, settings.anonKey);
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, anonKey);
       return true;
     }
 
-    function showLoginAlert(message, type = "warn") {
-      const box = el("loginAlert");
-      box.className = `notice notice-${type}`;
-      box.textContent = message;
-      box.classList.remove("hidden");
-    }
+    async function refreshAuthView() {
+      if (!supabaseClient) {
+        show($("loginView"), true);
+        show($("appView"), false);
+        $("setupDetails").open = true;
+        return;
+      }
 
-    function showAppAlert(message, type = "warn") {
-      const box = el("appAlert");
-      box.className = `notice notice-${type}`;
-      box.textContent = message;
-      box.classList.remove("hidden");
-    }
-
-    function hideAppAlert() {
-      el("appAlert").classList.add("hidden");
-    }
-
-    function showLoginView() {
-      el("loginView").classList.remove("hidden");
-      el("appView").classList.add("hidden");
-    }
-
-    function showAppView() {
-      el("loginView").classList.add("hidden");
-      el("appView").classList.remove("hidden");
-    }
-
-    function setLoading(button, loadingText) {
-      const original = button.textContent;
-      button.disabled = true;
-      button.textContent = loadingText;
-      return () => {
-        button.disabled = false;
-        button.textContent = original;
-      };
-    }
-
-    async function refreshSession() {
-      if (!supabaseClient) return null;
       const { data, error } = await supabaseClient.auth.getSession();
-      if (error) throw error;
-      currentSession = data.session;
-      return currentSession;
-    }
-
-    async function requireSession() {
-      const session = await refreshSession();
-      if (!session?.access_token) {
-        showLoginView();
-        throw new Error("ログインしてください");
-      }
-      return session;
-    }
-
-    async function callFunction(url, payload, options = {}) {
-      const session = await requireSession();
-      const method = options.method || "POST";
-      const fetchOptions = {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`
-        }
-      };
-      if (method !== "GET") {
-        fetchOptions.body = JSON.stringify(payload || {});
-      }
-      const res = await fetch(url, fetchOptions);
-      const text = await res.text();
-      let json = null;
-      try {
-        json = text ? JSON.parse(text) : null;
-      } catch {
-        json = { raw: text };
-      }
-      if (!res.ok || json?.success === false) {
-        const error = new Error(json?.error || json?.error_message || `HTTP ${res.status}`);
-        error.response = json;
-        throw error;
-      }
-      return json;
-    }
-
-    function renderJson(targetId, data) {
-      const box = el(targetId);
-      box.textContent = JSON.stringify(data, null, 2);
-      box.classList.remove("hidden");
-    }
-
-    function normalizeTemplates(response) {
-      const list = Array.isArray(response?.templates)
-        ? response.templates
-        : Array.isArray(response?.data)
-          ? response.data
-          : [];
-      return list.map((t) => {
-        const id = t.resend_template_id || t.id || t.template_id || t.alias || t.name || "";
-        const name = t.template_name || t.name || t.alias || id || "名称未設定テンプレート";
-        return {
-          ...t,
-          id,
-          resend_template_id: id,
-          template_name: name,
-          subject: t.subject || name
-        };
-      }).filter((t) => t.resend_template_id);
-    }
-
-    function renderTemplates(templates) {
-      const list = el("templateList");
-      list.innerHTML = "";
-      if (!templates.length) {
-        list.innerHTML = `<div class="notice notice-warn">テンプレートが見つかりませんでした。</div>`;
-        return;
-      }
-
-      templates.forEach((template) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "template-item";
-        button.innerHTML = `
-          <div class="template-name"></div>
-          <div class="template-meta"></div>
-          <div class="template-meta"></div>
-        `;
-        button.querySelector(".template-name").textContent = template.template_name;
-        button.querySelectorAll(".template-meta")[0].textContent = `ID: ${template.resend_template_id}`;
-        button.querySelectorAll(".template-meta")[1].textContent = template.subject ? `Subject: ${template.subject}` : "";
-        button.addEventListener("click", () => selectTemplate(template, button));
-        list.appendChild(button);
-      });
-    }
-
-    function selectTemplate(template, button) {
-      selectedTemplate = template;
-      document.querySelectorAll(".template-item").forEach((item) => item.classList.remove("active"));
-      if (button) button.classList.add("active");
-
-      const notice = el("selectedTemplateNotice");
-      notice.className = "notice notice-ok";
-      notice.textContent = `選択中：${template.template_name} / ${template.resend_template_id}`;
-      renderJson("templateRawBox", template);
-    }
-
-    function extractEmailsFromText(text) {
-      const matches = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || [];
-      return matches.map((email) => email.trim().toLowerCase());
-    }
-
-    function unique(values) {
-      return Array.from(new Set(values));
-    }
-
-    function renderEmailPreview() {
-      const preview = el("emailPreview");
-      preview.innerHTML = "";
-      if (!parsedEmails.length) {
-        preview.classList.add("hidden");
-        return;
-      }
-      parsedEmails.slice(0, 50).forEach((email, index) => {
-        const row = document.createElement("div");
-        row.className = "preview-email";
-        row.innerHTML = `<span></span><span></span>`;
-        row.children[0].textContent = email;
-        row.children[1].textContent = `#${index + 1}`;
-        preview.appendChild(row);
-      });
-      if (parsedEmails.length > 50) {
-        const row = document.createElement("div");
-        row.className = "small";
-        row.textContent = `他 ${parsedEmails.length - 50} 件`;
-        preview.appendChild(row);
-      }
-      preview.classList.remove("hidden");
-    }
-
-    function updateStatsFromParsed(extractedCount, uniqueCount) {
-      el("statExtracted").textContent = String(extractedCount);
-      el("statUnique").textContent = String(uniqueCount);
-      el("statValid").textContent = "-";
-      el("statSuppressed").textContent = "-";
-      el("statInvalidDuplicate").textContent = "-";
-    }
-
-    function updateStatsFromBatch(counts) {
-      el("statValid").textContent = String(counts?.valid_count ?? "-");
-      el("statSuppressed").textContent = String(counts?.suppressed_count ?? "-");
-      const invalid = Number(counts?.invalid_count || 0);
-      const duplicate = Number(counts?.duplicate_count || 0);
-      el("statInvalidDuplicate").textContent = String(invalid + duplicate);
-    }
-
-    async function login() {
-      const done = setLoading(el("loginButton"), "ログイン中...");
-      try {
-        if (!initSupabase()) {
-          showLoginAlert("初期設定で Supabase anon public key を保存してください。", "warn");
-          el("settingsContent").classList.remove("hidden");
-          return;
-        }
-        const email = el("loginEmail").value.trim();
-        const password = el("loginPassword").value;
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+      if (error) {
+        currentSession = null;
+      } else {
         currentSession = data.session;
-        await bootApp();
-      } catch (error) {
-        showLoginAlert(error.message || "ログインに失敗しました。", "danger");
-      } finally {
-        done();
       }
+
+      if (currentSession?.user?.email) {
+        show($("loginView"), false);
+        show($("appView"), true);
+        $("currentUserEmail").textContent = currentSession.user.email;
+      } else {
+        show($("loginView"), true);
+        show($("appView"), false);
+      }
+
+      updateButtons();
     }
 
-    async function logout() {
-      if (supabaseClient) {
-        await supabaseClient.auth.signOut();
-      }
-      currentSession = null;
-      showLoginView();
+    async function getAccessToken() {
+      if (!supabaseClient) throw new Error("Supabase anon public key が未設定です。");
+      const { data } = await supabaseClient.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error("ログインしてください。");
+      return token;
     }
 
-    async function bootApp() {
-      const session = await refreshSession();
-      if (!session) {
-        showLoginView();
+    async function callFunction(functionName, payload = null, method = "POST") {
+      const token = await getAccessToken();
+      const anonKey = getAnonKey();
+      const headers = {
+        "Authorization": `Bearer ${token}`,
+        "apikey": anonKey,
+      };
+
+      const options = { method, headers };
+      if (payload !== null) {
+        headers["Content-Type"] = "application/json";
+        options.body = JSON.stringify(payload);
+      }
+
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/${functionName}`, options);
+      const text = await res.text();
+      let data = null;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { success: false, raw_text: text };
+      }
+      data._http_ok = res.ok;
+      data._http_status = res.status;
+      return data;
+    }
+
+    function normalizeTemplate(template) {
+      const id = template.resend_template_id || template.id || template.template_id || template.alias || template.name || "";
+      const name = template.template_name || template.name || template.alias || id || "名称未設定テンプレート";
+      return {
+        ...template,
+        resend_template_id: id,
+        template_name: name,
+      };
+    }
+
+    function renderSelectedTemplate() {
+      if (!selectedTemplate) {
+        setStatus("selectedTemplateBox", "テンプレート未選択です。", "warn");
         return;
       }
-      el("currentUser").textContent = session.user?.email || "ログイン中";
-      showAppView();
+      setStatus(
+        "selectedTemplateBox",
+        `選択中：${selectedTemplate.template_name}\nID：${selectedTemplate.resend_template_id}`,
+        "success"
+      );
+    }
+
+    function renderTemplates() {
+      const box = $("templateList");
+      box.innerHTML = "";
+
+      if (currentTemplates.length === 0) {
+        box.innerHTML = '<div class="small">テンプレートはまだ読み込まれていません。</div>';
+        return;
+      }
+
+      currentTemplates.forEach((template, index) => {
+        const item = document.createElement("div");
+        item.className = "template-item" + (selectedTemplate?.resend_template_id === template.resend_template_id ? " active" : "");
+        item.innerHTML = `
+          <div class="template-name">${escapeHtml(template.template_name)}</div>
+          <div class="small mono">${escapeHtml(template.resend_template_id)}</div>
+        `;
+        item.addEventListener("click", () => {
+          selectedTemplate = template;
+          renderSelectedTemplate();
+          renderTemplates();
+          resetAfterTemplateOrCsvChange(false);
+          updateButtons();
+        });
+        box.appendChild(item);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function normalizeEmail(email) {
+      return String(email || "").trim().toLowerCase();
+    }
+
+    function extractEmailCandidates(text) {
+      const cleaned = String(text || "")
+        .replace(/\uFEFF/g, "")
+        .replace(/[<>]/g, " ");
+
+      return cleaned
+        .split(/[\s,;"'`|]+/)
+        .map((v) => v.trim())
+        .filter((v) => v.includes("@"))
+        .map((v) => v.replace(/^[\[\(]+|[\]\)]+$/g, ""))
+        .map(normalizeEmail)
+        .filter(Boolean);
+    }
+
+    function parseCsvText() {
+      const text = $("csvTextInput").value;
+      emailCandidates = extractEmailCandidates(text);
+
+      const valid = emailCandidates.filter(isValidEmail);
+      const invalid = emailCandidates.filter((email) => !isValidEmail(email));
+      const uniqueValid = Array.from(new Set(valid));
+      const duplicateCount = valid.length - uniqueValid.length;
+
+      $("localTotalCount").textContent = emailCandidates.length;
+      $("localValidCount").textContent = valid.length;
+      $("localInvalidCount").textContent = invalid.length;
+      $("localDuplicateCount").textContent = duplicateCount;
+      $("localUniqueCount").textContent = uniqueValid.length;
+
+      const preview = $("emailPreview");
+      preview.innerHTML = "";
+      if (emailCandidates.length > 0) {
+        uniqueValid.slice(0, 50).forEach((email) => {
+          const div = document.createElement("div");
+          div.textContent = email;
+          preview.appendChild(div);
+        });
+        if (uniqueValid.length > 50) {
+          const div = document.createElement("div");
+          div.textContent = `...ほか ${uniqueValid.length - 50} 件`;
+          preview.appendChild(div);
+        }
+        show(preview, true);
+        setStatus("csvStatus", `メールアドレス候補を ${emailCandidates.length} 件読み込みました。`, "success");
+      } else {
+        show(preview, false);
+        setStatus("csvStatus", "メールアドレス候補が見つかりません。CSVの内容を確認してください。", "warn");
+      }
+
+      resetBatchState();
+      updateButtons();
+    }
+
+    function resetBatchState() {
+      currentBatchId = null;
+      currentBatchCounts = null;
+      dryRunOk = false;
+      $("batchTotalCount").textContent = "0";
+      $("batchValidCount").textContent = "0";
+      $("batchSuppressedCount").textContent = "0";
+      $("batchInvalidCount").textContent = "0";
+      $("batchDuplicateCount").textContent = "0";
+      setStatus("batchStatus", "まだ送信対象は作成されていません。", "warn");
+      setStatus("dryRunStatus", "送信対象作成後に実行できます。", "warn");
+      setStatus("sendStatus", "dry run確認後に本送信できます。", "warn");
+      show($("batchRawDetails"), false);
+      show($("dryRunRawDetails"), false);
+      show($("sendRawDetails"), false);
+    }
+
+    function resetAfterTemplateOrCsvChange(parseAgain = true) {
+      if (parseAgain) parseCsvText();
+      else resetBatchState();
+    }
+
+    function updateButtons() {
+      const hasTemplate = Boolean(selectedTemplate?.resend_template_id);
+      const hasEmails = emailCandidates.length > 0;
+      const hasBatch = Boolean(currentBatchId);
+      const sendableCount = Number(currentBatchCounts?.valid_count || 0);
+
+      $("sendTestButton").disabled = !hasTemplate;
+      $("createBatchButton").disabled = !(hasTemplate && hasEmails);
+      $("dryRunButton").disabled = !(hasBatch && sendableCount > 0);
+      $("sendBatchButton").disabled = !(hasBatch && sendableCount > 0 && dryRunOk);
     }
 
     async function loadTemplates() {
-      const done = setLoading(el("loadTemplatesButton"), "読み込み中...");
-      hideAppAlert();
+      setStatus("templateStatus", "テンプレートを読み込み中です...", "warn");
       try {
-        const settings = loadSettings();
-        const response = await callFunction(settings.functions.getResendTemplates, null, { method: "GET" });
-        const templates = normalizeTemplates(response);
-        renderTemplates(templates);
-        showAppAlert(`テンプレートを ${templates.length} 件取得しました。`, "ok");
+        const data = await callFunction("get-resend-templates", null, "GET");
+        if (!data.success) {
+          setStatus("templateStatus", `テンプレート取得に失敗しました。\n${pretty(data)}`, "error");
+          return;
+        }
+        currentTemplates = (data.templates || []).map(normalizeTemplate).filter((t) => t.resend_template_id);
+        selectedTemplate = currentTemplates[0] || null;
+        renderTemplates();
+        renderSelectedTemplate();
+        setStatus("templateStatus", `テンプレートを ${currentTemplates.length} 件取得しました。`, "success");
+        updateButtons();
       } catch (error) {
-        showAppAlert(`テンプレート取得に失敗しました：${error.message}`, "danger");
-        if (error.response) renderJson("templateRawBox", error.response);
-      } finally {
-        done();
+        setStatus("templateStatus", error.message || String(error), "error");
       }
     }
 
     async function sendTestEmail() {
+      const testEmail = normalizeEmail($("testEmailInput").value);
       if (!selectedTemplate) {
-        showAppAlert("先にテンプレートを選択してください。", "warn");
+        setStatus("testStatus", "テンプレートを選択してください。", "warn");
         return;
       }
-      const testEmail = el("testEmail").value.trim();
-      if (!testEmail) {
-        showAppAlert("テスト送信先を入力してください。", "warn");
+      if (!isValidEmail(testEmail)) {
+        setStatus("testStatus", "テスト送信先メールアドレスを確認してください。", "warn");
         return;
       }
-      const done = setLoading(el("sendTestButton"), "送信中...");
-      hideAppAlert();
+
+      $("sendTestButton").disabled = true;
+      setStatus("testStatus", "テスト送信中です...", "warn");
       try {
-        const settings = loadSettings();
-        const response = await callFunction(settings.functions.sendTestEmail, {
+        const data = await callFunction("send-test-email", {
           resend_template_id: selectedTemplate.resend_template_id,
           template_name: selectedTemplate.template_name,
           test_email: testEmail,
-          customer_name: el("testCustomerName").value.trim() || "テスト太郎"
         });
-        renderJson("testResultBox", response);
-        showAppAlert("テスト送信しました。メールボックスを確認してください。", "ok");
+
+        if (data.success && data.resend_email_id) {
+          setStatus("testStatus", `テスト送信しました。\n送信先：${testEmail}\nResend Email ID：${data.resend_email_id}`, "success");
+        } else if (data.success) {
+          setStatus("testStatus", `Functionは完了しましたが、Resend Email IDが確認できません。\n${pretty(data)}`, "warn");
+        } else {
+          setStatus("testStatus", `テスト送信に失敗しました。\n${pretty(data)}`, "error");
+        }
       } catch (error) {
-        showAppAlert(`テスト送信に失敗しました：${error.message}`, "danger");
-        renderJson("testResultBox", error.response || { error: error.message });
+        setStatus("testStatus", error.message || String(error), "error");
       } finally {
-        done();
+        updateButtons();
       }
     }
 
-    async function readFileText(file) {
-      if (!file) return "";
-      return await file.text();
+    async function createSendBatch() {
+      if (!selectedTemplate) {
+        setStatus("batchStatus", "テンプレートを選択してください。", "warn");
+        return;
+      }
+      if (emailCandidates.length === 0) {
+        setStatus("batchStatus", "CSVからメールアドレスを読み込んでください。", "warn");
+        return;
+      }
+
+      resetBatchState();
+      setStatus("batchStatus", "送信対象を作成中です。配信停止リスト照合も自動実行しています...", "warn");
+      updateButtons();
+
+      try {
+        const data = await callFunction("create-send-batch", {
+          resend_template_id: selectedTemplate.resend_template_id,
+          template_name: selectedTemplate.template_name,
+          emails: emailCandidates,
+        });
+
+        $("batchRaw").textContent = pretty(data);
+        show($("batchRawDetails"), true);
+
+        if (!data.success || !data.batch_id) {
+          setStatus("batchStatus", `送信対象の作成に失敗しました。\n${pretty(data)}`, "error");
+          return;
+        }
+
+        currentBatchId = data.batch_id;
+        currentBatchCounts = data.counts || {};
+
+        const c = currentBatchCounts;
+        $("batchTotalCount").textContent = c.total_count ?? 0;
+        $("batchValidCount").textContent = c.valid_count ?? 0;
+        $("batchSuppressedCount").textContent = c.suppressed_count ?? 0;
+        $("batchInvalidCount").textContent = c.invalid_count ?? 0;
+        $("batchDuplicateCount").textContent = c.duplicate_count ?? 0;
+
+        if (Number(c.valid_count || 0) > 0) {
+          setStatus(
+            "batchStatus",
+            `送信対象を作成しました。\nBatch ID：${currentBatchId}\n送信対象：${c.valid_count}件\n配信停止除外：${c.suppressed_count || 0}件\n不正メール：${c.invalid_count || 0}件\n重複除外：${c.duplicate_count || 0}件`,
+            "success"
+          );
+          setStatus("dryRunStatus", "dry runを実行できます。", "warn");
+        } else {
+          setStatus(
+            "batchStatus",
+            `送信対象が0件です。本送信はできません。\n配信停止除外：${c.suppressed_count || 0}件\n不正メール：${c.invalid_count || 0}件\n重複除外：${c.duplicate_count || 0}件`,
+            "error"
+          );
+        }
+      } catch (error) {
+        setStatus("batchStatus", error.message || String(error), "error");
+      } finally {
+        updateButtons();
+      }
     }
 
-    async function parseCsv() {
-      const file = el("csvFile").files?.[0] || null;
-      const fileText = await readFileText(file);
-      const pastedText = el("csvText").value || "";
-      const combinedText = `${fileText}\n${pastedText}`;
-      const extracted = extractEmailsFromText(combinedText);
-      parsedEmails = unique(extracted);
-      updateStatsFromParsed(extracted.length, parsedEmails.length);
-      renderEmailPreview();
-      if (parsedEmails.length) {
-        showAppAlert(`メールアドレスを ${parsedEmails.length} 件読み込みました。`, "ok");
-      } else {
-        showAppAlert("メールアドレスが見つかりませんでした。", "warn");
+    async function dryRunBatch() {
+      if (!currentBatchId) return;
+      dryRunOk = false;
+      updateButtons();
+      setStatus("dryRunStatus", "dry run確認中です...", "warn");
+      try {
+        const data = await callFunction("send-approved-batch", {
+          batch_id: currentBatchId,
+          dry_run: true,
+        });
+
+        $("dryRunRaw").textContent = pretty(data);
+        show($("dryRunRawDetails"), true);
+
+        if (data.success && data.dry_run) {
+          const pending = Number(data.pending_count_in_this_run || 0);
+          if (pending > 0) {
+            dryRunOk = true;
+            setStatus("dryRunStatus", `dry run OKです。\n今回送信予定：${pending}件\n次に本送信できます。`, "success");
+            setStatus("sendStatus", "本送信できます。最初は limit 1 のまま送信してください。", "warn");
+          } else {
+            setStatus("dryRunStatus", "送信予定が0件です。本送信できません。", "error");
+          }
+        } else {
+          setStatus("dryRunStatus", `dry runに失敗しました。\n${pretty(data)}`, "error");
+        }
+      } catch (error) {
+        setStatus("dryRunStatus", error.message || String(error), "error");
+      } finally {
+        updateButtons();
+      }
+    }
+
+    async function sendApprovedBatch() {
+      if (!currentBatchId || !dryRunOk) return;
+
+      const limitRaw = Number($("sendLimitInput").value || 1);
+      const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 500) : 1;
+
+      const ok = confirm(`本当に送信しますか？\n\nBatch ID：${currentBatchId}\n今回の最大送信件数：${limit}件\n\n最初の確認では1件送信をおすすめします。`);
+      if (!ok) return;
+
+      $("sendBatchButton").disabled = true;
+      setStatus("sendStatus", "本送信中です...", "warn");
+
+      try {
+        const data = await callFunction("send-approved-batch", {
+          batch_id: currentBatchId,
+          limit,
+        });
+
+        $("sendRaw").textContent = pretty(data);
+        show($("sendRawDetails"), true);
+
+        const sent = Number(data.sent_count || 0);
+        const failed = Number(data.failed_count || 0);
+        const remaining = Number(data.remaining_pending_count || 0);
+
+        if (!data.success) {
+          setStatus("sendStatus", `本送信に失敗しました。\n${pretty(data)}`, "error");
+          return;
+        }
+
+        if (failed > 0) {
+          setStatus(
+            "sendStatus",
+            `送信失敗があります。\n送信成功：${sent}件\n失敗：${failed}件\n残り：${remaining}件\n\nsuccess:true は「Function処理が完了した」という意味です。送信成功判定は sent_count / failed_count を見てください。`,
+            "error"
+          );
+          return;
+        }
+
+        if (sent > 0) {
+          const type = remaining > 0 ? "warn" : "success";
+          setStatus(
+            "sendStatus",
+            `送信成功です。\n送信成功：${sent}件\n失敗：${failed}件\n残り：${remaining}件\nステータス：${data.status || ""}`,
+            type
+          );
+
+          if (remaining > 0) {
+            dryRunOk = true;
+          } else {
+            dryRunOk = false;
+          }
+          return;
+        }
+
+        setStatus(
+          "sendStatus",
+          `送信されたメールはありません。\n送信成功：${sent}件\n失敗：${failed}件\n残り：${remaining}件`,
+          "warn"
+        );
+      } catch (error) {
+        setStatus("sendStatus", error.message || String(error), "error");
+      } finally {
+        updateButtons();
       }
     }
 
     function clearCsv() {
-      el("csvFile").value = "";
-      el("csvFileName").textContent = "ファイル未選択";
-      el("csvText").value = "";
-      parsedEmails = [];
-      updateStatsFromParsed(0, 0);
-      renderEmailPreview();
-      el("batchNotice").className = "notice notice-warn";
-      el("batchNotice").textContent = "まだ送信対象は作成されていません。";
-      el("batchResultBox").classList.add("hidden");
+      $("csvTextInput").value = "";
+      $("csvFileInput").value = "";
+      emailCandidates = [];
+      $("localTotalCount").textContent = "0";
+      $("localValidCount").textContent = "0";
+      $("localInvalidCount").textContent = "0";
+      $("localDuplicateCount").textContent = "0";
+      $("localUniqueCount").textContent = "0";
+      show($("emailPreview"), false);
+      hideStatus("csvStatus");
+      resetBatchState();
+      updateButtons();
     }
 
-    async function createBatch() {
-      if (!selectedTemplate) {
-        showAppAlert("先にテンプレートを選択してください。", "warn");
-        return;
-      }
-      if (!parsedEmails.length) {
-        showAppAlert("先にCSVからメールアドレスを読み込んでください。", "warn");
-        return;
-      }
-      const done = setLoading(el("createBatchButton"), "作成中...");
-      hideAppAlert();
-      try {
-        const settings = loadSettings();
-        const response = await callFunction(settings.functions.createSendBatch, {
-          resend_template_id: selectedTemplate.resend_template_id,
-          template_name: selectedTemplate.template_name,
-          emails: parsedEmails
+    document.addEventListener("DOMContentLoaded", async () => {
+      const config = loadConfig();
+      $("anonKeyInput").value = config.anonKey || "";
+      $("testEmailInput").value = "refinas.ads@gmail.com";
+
+      initSupabaseClient();
+      await refreshAuthView();
+      renderTemplates();
+      renderSelectedTemplate();
+      resetBatchState();
+
+      $("saveConfigButton").addEventListener("click", async () => {
+        const anonKey = $("anonKeyInput").value.trim();
+        if (!anonKey) {
+          setStatus("loginStatus", "Supabase anon public key を入力してください。", "warn");
+          return;
+        }
+        saveConfig({ anonKey });
+        initSupabaseClient();
+        setStatus("loginStatus", "設定を保存しました。ログインしてください。", "success");
+        await refreshAuthView();
+      });
+
+      $("loginButton").addEventListener("click", async () => {
+        if (!supabaseClient && !initSupabaseClient()) {
+          setStatus("loginStatus", "先に初期設定で Supabase anon public key を保存してください。", "warn");
+          $("setupDetails").open = true;
+          return;
+        }
+
+        const email = $("loginEmail").value.trim();
+        const password = $("loginPassword").value;
+        if (!email || !password) {
+          setStatus("loginStatus", "メールアドレスとパスワードを入力してください。", "warn");
+          return;
+        }
+
+        setStatus("loginStatus", "ログイン中です...", "warn");
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) {
+          setStatus("loginStatus", error.message || "ログインに失敗しました。", "error");
+          return;
+        }
+        hideStatus("loginStatus");
+        await refreshAuthView();
+      });
+
+      $("logoutButton").addEventListener("click", async () => {
+        if (supabaseClient) await supabaseClient.auth.signOut();
+        currentSession = null;
+        await refreshAuthView();
+      });
+
+      $("loadTemplatesButton").addEventListener("click", loadTemplates);
+      $("sendTestButton").addEventListener("click", sendTestEmail);
+      $("parseCsvButton").addEventListener("click", parseCsvText);
+      $("clearCsvButton").addEventListener("click", clearCsv);
+      $("createBatchButton").addEventListener("click", createSendBatch);
+      $("dryRunButton").addEventListener("click", dryRunBatch);
+      $("sendBatchButton").addEventListener("click", sendApprovedBatch);
+
+      $("csvFileInput").addEventListener("change", async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const text = await file.text();
+        $("csvTextInput").value = text;
+        parseCsvText();
+      });
+
+      $("csvTextInput").addEventListener("input", () => {
+        resetBatchState();
+        updateButtons();
+      });
+
+      if (supabaseClient) {
+        supabaseClient.auth.onAuthStateChange(async () => {
+          await refreshAuthView();
         });
-        currentBatchId = response.batch_id || "";
-        el("batchIdInput").value = currentBatchId;
-        updateStatsFromBatch(response.counts || {});
-        const notice = el("batchNotice");
-        notice.className = "notice notice-ok";
-        notice.textContent = `送信対象を作成しました。batch_id: ${currentBatchId}`;
-        renderJson("batchResultBox", response);
-        showAppAlert("送信対象を作成しました。次に dry run を実行してください。", "ok");
-      } catch (error) {
-        showAppAlert(`送信対象作成に失敗しました：${error.message}`, "danger");
-        renderJson("batchResultBox", error.response || { error: error.message });
-      } finally {
-        done();
       }
-    }
-
-    async function dryRun() {
-      const batchId = el("batchIdInput").value.trim();
-      if (!batchId) {
-        showAppAlert("batch_id がありません。先に送信対象を作成してください。", "warn");
-        return;
-      }
-      const done = setLoading(el("dryRunButton"), "確認中...");
-      hideAppAlert();
-      try {
-        const settings = loadSettings();
-        const response = await callFunction(settings.functions.sendApprovedBatch, {
-          batch_id: batchId,
-          dry_run: true
-        });
-        renderJson("sendResultBox", response);
-        showAppAlert("dry run が完了しました。結果を確認してください。", "ok");
-      } catch (error) {
-        showAppAlert(`dry run に失敗しました：${error.message}`, "danger");
-        renderJson("sendResultBox", error.response || { error: error.message });
-      } finally {
-        done();
-      }
-    }
-
-    async function sendApprovedBatch(forceLimit) {
-      const batchId = el("batchIdInput").value.trim();
-      if (!batchId) {
-        showAppAlert("batch_id がありません。先に送信対象を作成してください。", "warn");
-        return;
-      }
-      if (!el("confirmSendCheckbox").checked) {
-        showAppAlert("本送信前の確認チェックを入れてください。", "warn");
-        return;
-      }
-      const limitValue = forceLimit || Number(el("sendLimit").value || 1);
-      const limit = Math.min(Math.max(Number(limitValue) || 1, 1), 500);
-      const button = forceLimit === 500 ? el("sendAllButton") : el("sendOneButton");
-      const done = setLoading(button, "送信中...");
-      hideAppAlert();
-      try {
-        const settings = loadSettings();
-        const response = await callFunction(settings.functions.sendApprovedBatch, {
-          batch_id: batchId,
-          limit
-        });
-        renderJson("sendResultBox", response);
-        showAppAlert(`本送信が完了しました。送信: ${response.sent_count || 0}件 / 失敗: ${response.failed_count || 0}件`, "ok");
-        el("confirmSendCheckbox").checked = false;
-      } catch (error) {
-        showAppAlert(`本送信に失敗しました：${error.message}`, "danger");
-        renderJson("sendResultBox", error.response || { error: error.message });
-      } finally {
-        done();
-      }
-    }
-
-    function bindEvents() {
-      el("settingsToggle").addEventListener("click", () => {
-        el("settingsContent").classList.toggle("hidden");
-      });
-
-      el("openSettingsButton").addEventListener("click", () => {
-        showLoginView();
-        el("settingsContent").classList.remove("hidden");
-      });
-
-      el("saveSettingsButton").addEventListener("click", () => {
-        const settings = getSettingsFromForm();
-        saveSettings(settings);
-        initSupabase();
-        showLoginAlert("設定を保存しました。", "ok");
-      });
-
-      el("loginButton").addEventListener("click", login);
-      el("loginPassword").addEventListener("keydown", (event) => {
-        if (event.key === "Enter") login();
-      });
-      el("logoutButton").addEventListener("click", logout);
-      el("loadTemplatesButton").addEventListener("click", loadTemplates);
-      el("sendTestButton").addEventListener("click", sendTestEmail);
-      el("parseCsvButton").addEventListener("click", parseCsv);
-      el("clearCsvButton").addEventListener("click", clearCsv);
-      el("createBatchButton").addEventListener("click", createBatch);
-      el("dryRunButton").addEventListener("click", dryRun);
-      el("sendOneButton").addEventListener("click", () => sendApprovedBatch());
-      el("sendAllButton").addEventListener("click", () => sendApprovedBatch(500));
-
-      el("csvFile").addEventListener("change", () => {
-        const file = el("csvFile").files?.[0];
-        el("csvFileName").textContent = file ? `選択中：${file.name}` : "ファイル未選択";
-      });
-    }
-
-    async function main() {
-      fillSettingsForm();
-      bindEvents();
-      const hasClient = initSupabase();
-      if (!hasClient) {
-        showLoginView();
-        showLoginAlert("初回は初期設定を開いて anon public key を保存してください。", "warn");
-        el("settingsContent").classList.remove("hidden");
-        return;
-      }
-      try {
-        await bootApp();
-      } catch {
-        showLoginView();
-      }
-    }
-
-    main();
+    });
   </script>
 </body>
 </html>
