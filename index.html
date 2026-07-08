@@ -544,6 +544,48 @@
       backdrop-filter: blur(14px);
     }
 
+
+
+    .auth-panel {
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      background: rgba(10,10,10,.76);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .auth-status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .auth-status.good { color: #86efac; }
+    .auth-status.bad { color: #fca5a5; }
+
+    .auth-user {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 1080px) {
@@ -562,6 +604,7 @@
       .footer-actions button { width: 100%; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="app">
@@ -575,20 +618,30 @@
       </div>
       <div class="top-actions">
         <span class="pill"><span class="dot"></span>Production mode</span>
+        <span class="auth-user" id="authUserPill">未ログイン</span>
+        <button class="ghost hidden" id="logoutButton" type="button" onclick="logoutAdmin()">ログアウト</button>
         <button class="secondary" type="button" onclick="openStep(0)">新規配信</button>
       </div>
     </header>
 
     <details class="settings" id="settingsBox">
-      <summary>接続設定 / Function URL</summary>
+      <summary>接続設定 / Supabase / Function URL</summary>
       <div class="settings-body">
         <div class="notice warn" style="margin-bottom:16px;">
-          Function URLは初期設定済みです。送信用秘密キーの入力欄は削除しました。ログイン認証は後で追加する前提です。
+          Supabase Authログイン用に anon public key を保存してください。service_role key は絶対にここへ入れないでください。
         </div>
         <div class="grid-3">
           <div class="field">
+            <label for="supabaseUrl">Supabase Project URL</label>
+            <input id="supabaseUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co" />
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="supabaseAnonKey">Supabase anon public key</label>
+            <input id="supabaseAnonKey" type="password" value="" placeholder="Project Settings > API > anon public key を貼り付け" autocomplete="off" />
+          </div>
+          <div class="field">
             <label for="templatesUrl">テンプレート取得 Function URL</label>
-            <input id="templatesUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-email-templates" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-email-templates" />
+            <input id="templatesUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-resend-templates" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-resend-templates" />
           </div>
           <div class="field">
             <label for="checkSuppressionUrl">配信停止リスト照合 Function URL</label>
@@ -608,11 +661,32 @@
           </div>
         </div>
         <div class="btn-row">
-          <button class="secondary" type="button" onclick="saveSettings()">URLを保存</button>
-          <button class="ghost" type="button" onclick="clearSettings()">保存URLを削除</button>
+          <button class="secondary" type="button" onclick="saveSettings()">設定を保存</button>
+          <button class="ghost" type="button" onclick="clearSettings()">保存設定を削除</button>
         </div>
       </div>
     </details>
+
+    <section class="auth-panel" id="authPanel">
+      <div class="panel-header" style="padding:0;border:0;margin-bottom:14px;">
+        <div>
+          <h3 style="margin:0;font-size:16px;">管理画面ログイン</h3>
+          <p class="sub">Supabase Authのメールアドレス・パスワードでログインします。ログイン後、各FunctionにJWTを付けて実行します。</p>
+        </div>
+      </div>
+      <div class="auth-grid" id="loginFormArea">
+        <div class="field">
+          <label for="loginEmail">メールアドレス</label>
+          <input id="loginEmail" type="email" placeholder="refinas.ads@gmail.com" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">パスワード</label>
+          <input id="loginPassword" type="password" placeholder="Supabase Authのパスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') loginAdmin()" />
+        </div>
+        <button class="primary" type="button" onclick="loginAdmin()">ログイン</button>
+      </div>
+      <div class="auth-status" id="authStatus">未ログインです。先に接続設定で anon public key を保存してください。</div>
+    </section>
 
     <div class="hero" style="margin-top:18px;">
       <h2>Campaign builder for safe email delivery.</h2>
@@ -627,7 +701,7 @@
           <div class="panel-header">
             <div>
               <h3>1. テンプレート選択</h3>
-              <p>Supabaseの email_templates からテンプレートを取得し、配信で使うテンプレートを選びます。</p>
+              <p>Resendからテンプレート一覧を取得し、配信で使うテンプレートを選びます。</p>
             </div>
             <button class="primary" type="button" onclick="loadTemplates()">テンプレートを読み込み</button>
           </div>
@@ -649,7 +723,7 @@
           <div class="panel-header">
             <div>
               <h3>2. HTMLメールプレビュー</h3>
-              <p>選択したテンプレートのプレビューを確認します。preview_html が未登録の場合は、プレビューは表示されません。</p>
+              <p>選択したテンプレートのプレビューを確認します。Resend APIから本文プレビューを取得できない場合は、件名とテンプレートIDのみ確認します。</p>
             </div>
             <span class="badge blue" id="previewTemplateBadge">No template</span>
           </div>
@@ -836,10 +910,14 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'refinasMailWizardSettingsV1';
+    const STORAGE_KEY = 'refinasMailWizardSettingsV2Auth';
+    const DEFAULT_SUPABASE_URL = 'https://gusxlxuosndznwhrcgnh.supabase.co';
+    const DEFAULT_SUPABASE_ANON_KEY = '';
+    let supabaseClient = null;
+    let currentUser = null;
 
     const DEFAULT_FUNCTION_URLS = {
-      templatesUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-email-templates',
+      templatesUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/get-resend-templates',
       checkSuppressionUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/check-suppression-list',
       createBatchFromListUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/create-send-batch-from-list',
       sendTestUrl: 'https://gusxlxuosndznwhrcgnh.supabase.co/functions/v1/send-test-email',
@@ -869,10 +947,12 @@
       sendResponse: null,
     };
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
       renderStepNav();
       bindCsvFile();
       loadSettings();
+      initSupabaseClient();
+      await refreshAuthState();
     });
 
     function renderStepNav() {
@@ -906,16 +986,147 @@
       return value;
     }
 
+    function getSupabaseUrl() {
+      return (document.getElementById('supabaseUrl')?.value || DEFAULT_SUPABASE_URL).trim();
+    }
+
+    function getSupabaseAnonKey() {
+      return (document.getElementById('supabaseAnonKey')?.value || DEFAULT_SUPABASE_ANON_KEY).trim();
+    }
+
+    function initSupabaseClient() {
+      const url = getSupabaseUrl();
+      const anonKey = getSupabaseAnonKey();
+
+      if (!url || !anonKey) {
+        supabaseClient = null;
+        updateAuthUi(null, 'Supabase anon public key が未設定です。接続設定に貼り付けて保存してください。');
+        return false;
+      }
+
+      if (!window.supabase || !window.supabase.createClient) {
+        supabaseClient = null;
+        updateAuthUi(null, 'Supabase JS SDKを読み込めませんでした。ネットワークを確認してください。');
+        return false;
+      }
+
+      supabaseClient = window.supabase.createClient(url, anonKey);
+      return true;
+    }
+
+    async function refreshAuthState() {
+      if (!supabaseClient && !initSupabaseClient()) return null;
+
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        currentUser = data.session?.user || null;
+        updateAuthUi(currentUser);
+        return currentUser;
+      } catch (error) {
+        currentUser = null;
+        updateAuthUi(null, error.message || 'ログイン状態の確認に失敗しました。');
+        return null;
+      }
+    }
+
+    function updateAuthUi(user, message) {
+      const pill = document.getElementById('authUserPill');
+      const status = document.getElementById('authStatus');
+      const form = document.getElementById('loginFormArea');
+      const logout = document.getElementById('logoutButton');
+
+      if (user) {
+        if (pill) pill.textContent = `ログイン中：${user.email || user.id}`;
+        if (status) {
+          status.className = 'auth-status good';
+          status.textContent = `ログイン中：${user.email || user.id}`;
+        }
+        if (form) form.classList.add('hidden');
+        if (logout) logout.classList.remove('hidden');
+      } else {
+        if (pill) pill.textContent = '未ログイン';
+        if (status) {
+          status.className = message ? 'auth-status bad' : 'auth-status';
+          status.textContent = message || '未ログインです。メールアドレスとパスワードでログインしてください。';
+        }
+        if (form) form.classList.remove('hidden');
+        if (logout) logout.classList.add('hidden');
+      }
+    }
+
+    async function loginAdmin() {
+      try {
+        if (!supabaseClient && !initSupabaseClient()) {
+          throw new Error('先に接続設定で Supabase anon public key を保存してください。');
+        }
+
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        if (!email) throw new Error('メールアドレスを入力してください。');
+        if (!password) throw new Error('パスワードを入力してください。');
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        currentUser = data.user || null;
+        updateAuthUi(currentUser);
+      } catch (error) {
+        updateAuthUi(null, error.message || 'ログインに失敗しました。');
+      }
+    }
+
+    async function logoutAdmin() {
+      try {
+        if (supabaseClient) await supabaseClient.auth.signOut();
+      } catch (_) {}
+      currentUser = null;
+      updateAuthUi(null, 'ログアウトしました。');
+    }
+
+    async function getAccessToken() {
+      if (!supabaseClient && !initSupabaseClient()) {
+        throw new Error('Supabase anon public key が未設定です。接続設定に貼り付けて保存してください。');
+      }
+
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) throw error;
+
+      const token = data.session?.access_token;
+      if (!token) {
+        updateAuthUi(null, 'ログインが必要です。');
+        throw new Error('ログインしてください。');
+      }
+
+      currentUser = data.session?.user || null;
+      updateAuthUi(currentUser);
+      return token;
+    }
+
     async function callFunction(url, payload) {
+      const token = await getAccessToken();
+      const anonKey = getSupabaseAnonKey();
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...(anonKey ? { 'apikey': anonKey } : {}),
         },
         body: JSON.stringify(payload || {}),
       });
 
-      const data = await response.json().catch(() => null);
+      const data = await response.json().catch(async () => {
+        const text = await response.text().catch(() => '');
+        return text ? { raw: text } : null;
+      });
+
       if (!response.ok) {
         throw new Error(JSON.stringify(data, null, 2));
       }
@@ -923,14 +1134,19 @@
     }
 
     function saveSettings() {
-      const ids = ['templatesUrl', 'checkSuppressionUrl', 'createBatchFromListUrl', 'sendTestUrl', 'sendBatchUrl'];
+      const ids = ['supabaseUrl', 'supabaseAnonKey', 'templatesUrl', 'checkSuppressionUrl', 'createBatchFromListUrl', 'sendTestUrl', 'sendBatchUrl'];
       const data = {};
       ids.forEach(id => data[id] = document.getElementById(id).value.trim());
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      alert('URLを保存しました。');
+      initSupabaseClient();
+      refreshAuthState();
+      alert('設定を保存しました。');
     }
 
     function loadSettings() {
+      const supabaseUrlEl = document.getElementById('supabaseUrl');
+      if (supabaseUrlEl && !supabaseUrlEl.value) supabaseUrlEl.value = DEFAULT_SUPABASE_URL;
+
       Object.entries(DEFAULT_FUNCTION_URLS).forEach(([id, value]) => {
         const el = document.getElementById(id);
         if (el && !el.value) el.value = value;
@@ -942,21 +1158,52 @@
         const data = JSON.parse(saved);
         Object.entries(data).forEach(([id, value]) => {
           const el = document.getElementById(id);
-          if (el) el.value = value || DEFAULT_FUNCTION_URLS[id] || '';
+          if (el) el.value = value || DEFAULT_FUNCTION_URLS[id] || (id === 'supabaseUrl' ? DEFAULT_SUPABASE_URL : '');
         });
       } catch (_) {}
     }
 
     function clearSettings() {
       localStorage.removeItem(STORAGE_KEY);
-      alert('保存URLを削除しました。');
+      alert('保存設定を削除しました。');
+      location.reload();
+    }
+
+    function normalizeTemplateFromApi(template) {
+      const resendId =
+        template.resend_template_id ||
+        template.template_id ||
+        template.id ||
+        template.alias ||
+        template.name ||
+        template.template_key ||
+        '';
+
+      const key = template.template_key || resendId;
+      const name =
+        template.template_name ||
+        template.name ||
+        template.alias ||
+        template.subject ||
+        key ||
+        '名称未設定テンプレート';
+
+      return {
+        ...template,
+        template_key: key,
+        template_name: name,
+        resend_template_id: resendId,
+        subject: template.subject || name,
+        description: template.description || template.status || '',
+        preview_html: template.preview_html || '',
+      };
     }
 
     async function loadTemplates() {
       try {
         const url = getUrl('templatesUrl', 'テンプレート取得 Function URL');
-        const data = await callFunction(url, {});
-        state.templates = Array.isArray(data.templates) ? data.templates : [];
+        const data = await callFunction(url, { limit: 100 });
+        state.templates = (Array.isArray(data.templates) ? data.templates : []).map(normalizeTemplateFromApi);
         renderTemplates();
         if (state.templates[0]) selectTemplate(state.templates[0].template_key);
       } catch (error) {
@@ -1202,6 +1449,9 @@
         const records = state.checkedRecords.slice(0, limit);
         const payload = {
           template_key: state.selectedTemplate.template_key,
+          resend_template_id: state.selectedTemplate.resend_template_id,
+          template_name: state.selectedTemplate.template_name,
+          subject: document.getElementById('subjectOverride').value.trim() || state.selectedTemplate.subject || '',
           list_type_key: document.getElementById('listTypeKey').value.trim() || null,
           records,
           notes: document.getElementById('campaignMemo').value.trim() || null,
@@ -1247,6 +1497,8 @@
         const payload = {
           test_email: testEmail,
           template_key: state.selectedTemplate.template_key,
+          resend_template_id: state.selectedTemplate.resend_template_id,
+          template_name: state.selectedTemplate.template_name,
           name: sample.name || 'テスト様',
           store_name: sample.store_name || sample.store || 'リフィナス',
           reply_email: document.getElementById('replyEmail').value.trim(),
@@ -1280,6 +1532,9 @@
         const url = getUrl('sendBatchUrl', '本送信 Function URL');
         const payload = {
           batch_id: state.batch.id,
+          resend_template_id: state.selectedTemplate ? state.selectedTemplate.resend_template_id : undefined,
+          template_name: state.selectedTemplate ? state.selectedTemplate.template_name : undefined,
+          template_key: state.selectedTemplate ? state.selectedTemplate.template_key : undefined,
           confirm_text: document.getElementById('confirmText').value.trim(),
           reply_email: document.getElementById('replyEmail').value.trim(),
           subject: document.getElementById('subjectOverride').value.trim() || undefined,
