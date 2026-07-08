@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>REFINAS Mail 管理画面</title>
+  <!-- ロゴは固定URLを使用。ファビコンは後で設定します。 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -132,27 +133,32 @@
 
     .brand {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      gap: 10px;
       margin-bottom: 24px;
+      text-align: center;
     }
 
     .brand-mark {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: #111;
-      color: #fff;
-      font-weight: 900;
-      letter-spacing: -.06em;
+      width: min(280px, 82vw);
+      height: 68px;
+      display: block;
+      background: transparent url("https://gusxlxuosndznwhrcgnh.supabase.co/storage/v1/object/public/public-assets/logo-wide.png") center / contain no-repeat;
+      border: none;
+      border-radius: 0;
+      color: transparent;
+      overflow: hidden;
+      font-size: 0;
+      line-height: 0;
     }
 
     .brand-title {
       font-weight: 900;
-      font-size: 20px;
-      letter-spacing: -.04em;
+      font-size: 22px;
+      letter-spacing: -.03em;
+      line-height: 1.25;
     }
 
     .form-stack {
@@ -167,11 +173,42 @@
     }
 
     .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      position: relative;
+      display: grid;
+      place-items: center;
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
+      min-height: 96px;
+    }
+
+    .topbar .brand {
+      margin-bottom: 0;
+    }
+
+    .topbar .brand-mark {
+      width: min(300px, 72vw);
+      height: 64px;
+    }
+
+    .topbar .user-pill {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    @media (max-width: 740px) {
+      .topbar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 0;
+      }
+
+      .topbar .user-pill {
+        position: static;
+        transform: none;
+      }
     }
 
     .user-pill {
@@ -392,11 +429,8 @@
   <div id="loginView" class="login-wrap hidden">
     <div class="login-card">
       <div class="brand">
-        <div class="brand-mark">R</div>
-        <div>
-          <div class="brand-title">REFINAS Mail</div>
-          <div class="small">メール配信管理画面</div>
-        </div>
+        <div class="brand-mark" aria-label="REFINAS"></div>
+        <div class="brand-title">メール配信管理画面</div>
       </div>
 
       <div class="form-stack">
@@ -430,11 +464,8 @@
   <main id="appView" class="app hidden">
     <div class="topbar">
       <div class="brand">
-        <div class="brand-mark">R</div>
-        <div>
-          <div class="brand-title">REFINAS Mail</div>
-          <div class="small">CSVはメールアドレスだけ。配信停止除外は自動で実施します。</div>
-        </div>
+        <div class="brand-mark" aria-label="REFINAS"></div>
+        <div class="brand-title">メール配信管理画面</div>
       </div>
       <div class="user-pill">
         <span id="currentUserEmail" class="small"></span>
