@@ -603,11 +603,130 @@
       .footer-actions { flex-direction: column-reverse; }
       .footer-actions button { width: 100%; }
     }
+
+
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.06), transparent 32%),
+        #050505;
+    }
+    .login-page.hidden { display: none; }
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(17,17,17,.96);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .login-brand .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--black);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .login-card h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+    .login-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .login-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .login-status {
+      min-height: 18px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    .login-status.good { color: #86efac; }
+    .login-status.bad { color: #fca5a5; }
+    .login-setup {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .login-setup details summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .app.locked { display: none; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div class="app">
+
+  <section class="login-page" id="loginPage">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="logo">R</div>
+        <div>
+          <h1>Refinas Mail</h1>
+          <p>メールアドレスとパスワードでログインしてください。</p>
+        </div>
+      </div>
+
+      <div class="login-form">
+        <div class="field">
+          <label for="loginEmail">メールアドレス</label>
+          <input id="loginEmail" type="email" placeholder="refinas.ads@gmail.com" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">パスワード</label>
+          <input id="loginPassword" type="password" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') loginAdmin()" />
+        </div>
+        <button class="primary" type="button" onclick="loginAdmin()">ログイン</button>
+      </div>
+
+      <div class="login-status" id="loginStatus">未ログインです。</div>
+
+      <div class="login-setup">
+        <details>
+          <summary>初期設定を開く</summary>
+          <div class="field" style="margin-top:14px;">
+            <label for="loginSupabaseUrl">Supabase Project URL</label>
+            <input id="loginSupabaseUrl" type="text" value="https://gusxlxuosndznwhrcgnh.supabase.co" placeholder="https://gusxlxuosndznwhrcgnh.supabase.co" />
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label for="loginSupabaseAnonKey">Supabase anon public key</label>
+            <input id="loginSupabaseAnonKey" type="password" value="" placeholder="Project Settings > API > anon public key" autocomplete="off" />
+          </div>
+          <button class="secondary" type="button" style="margin-top:12px;width:100%;" onclick="saveLoginSettings()">初期設定を保存</button>
+          <p>service_role key は絶対に入力しないでください。</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <div class="app locked" id="appRoot">
     <header class="topbar">
       <div class="brand">
         <div class="logo">R</div>
@@ -667,26 +786,7 @@
       </div>
     </details>
 
-    <section class="auth-panel" id="authPanel">
-      <div class="panel-header" style="padding:0;border:0;margin-bottom:14px;">
-        <div>
-          <h3 style="margin:0;font-size:16px;">管理画面ログイン</h3>
-          <p class="sub">Supabase Authのメールアドレス・パスワードでログインします。ログイン後、各FunctionにJWTを付けて実行します。</p>
-        </div>
-      </div>
-      <div class="auth-grid" id="loginFormArea">
-        <div class="field">
-          <label for="loginEmail">メールアドレス</label>
-          <input id="loginEmail" type="email" placeholder="refinas.ads@gmail.com" autocomplete="username" />
-        </div>
-        <div class="field">
-          <label for="loginPassword">パスワード</label>
-          <input id="loginPassword" type="password" placeholder="Supabase Authのパスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') loginAdmin()" />
-        </div>
-        <button class="primary" type="button" onclick="loginAdmin()">ログイン</button>
-      </div>
-      <div class="auth-status" id="authStatus">未ログインです。先に接続設定で anon public key を保存してください。</div>
-    </section>
+    <!-- ログイン画面はページ上部で表示します -->
 
     <div class="hero" style="margin-top:18px;">
       <h2>Campaign builder for safe email delivery.</h2>
@@ -1032,31 +1132,73 @@
 
     function updateAuthUi(user, message) {
       const pill = document.getElementById('authUserPill');
-      const status = document.getElementById('authStatus');
-      const form = document.getElementById('loginFormArea');
+      const loginStatus = document.getElementById('loginStatus');
+      const authStatus = document.getElementById('authStatus');
       const logout = document.getElementById('logoutButton');
+      const loginPage = document.getElementById('loginPage');
+      const appRoot = document.getElementById('appRoot');
 
       if (user) {
         if (pill) pill.textContent = `ログイン中：${user.email || user.id}`;
-        if (status) {
-          status.className = 'auth-status good';
-          status.textContent = `ログイン中：${user.email || user.id}`;
+        if (loginStatus) {
+          loginStatus.className = 'login-status good';
+          loginStatus.textContent = `ログイン中：${user.email || user.id}`;
         }
-        if (form) form.classList.add('hidden');
+        if (authStatus) {
+          authStatus.className = 'auth-status good';
+          authStatus.textContent = `ログイン中：${user.email || user.id}`;
+        }
         if (logout) logout.classList.remove('hidden');
+        if (loginPage) loginPage.classList.add('hidden');
+        if (appRoot) appRoot.classList.remove('locked');
       } else {
         if (pill) pill.textContent = '未ログイン';
-        if (status) {
-          status.className = message ? 'auth-status bad' : 'auth-status';
-          status.textContent = message || '未ログインです。メールアドレスとパスワードでログインしてください。';
+        const text = message || 'メールアドレスとパスワードでログインしてください。';
+        if (loginStatus) {
+          loginStatus.className = message ? 'login-status bad' : 'login-status';
+          loginStatus.textContent = text;
         }
-        if (form) form.classList.remove('hidden');
+        if (authStatus) {
+          authStatus.className = message ? 'auth-status bad' : 'auth-status';
+          authStatus.textContent = text;
+        }
         if (logout) logout.classList.add('hidden');
+        if (loginPage) loginPage.classList.remove('hidden');
+        if (appRoot) appRoot.classList.add('locked');
       }
+    }
+
+
+    function syncLoginSettingsToMain() {
+      const loginUrl = document.getElementById('loginSupabaseUrl');
+      const loginAnon = document.getElementById('loginSupabaseAnonKey');
+      const mainUrl = document.getElementById('supabaseUrl');
+      const mainAnon = document.getElementById('supabaseAnonKey');
+
+      if (loginUrl && mainUrl && loginUrl.value.trim()) mainUrl.value = loginUrl.value.trim();
+      if (loginAnon && mainAnon && loginAnon.value.trim()) mainAnon.value = loginAnon.value.trim();
+    }
+
+    function syncMainSettingsToLogin() {
+      const loginUrl = document.getElementById('loginSupabaseUrl');
+      const loginAnon = document.getElementById('loginSupabaseAnonKey');
+      const mainUrl = document.getElementById('supabaseUrl');
+      const mainAnon = document.getElementById('supabaseAnonKey');
+
+      if (loginUrl && mainUrl) loginUrl.value = mainUrl.value || DEFAULT_SUPABASE_URL;
+      if (loginAnon && mainAnon) loginAnon.value = mainAnon.value || DEFAULT_SUPABASE_ANON_KEY;
+    }
+
+    function saveLoginSettings() {
+      syncLoginSettingsToMain();
+      saveSettings(false);
+      initSupabaseClient();
+      updateAuthUi(currentUser, '初期設定を保存しました。ログインしてください。');
     }
 
     async function loginAdmin() {
       try {
+        syncLoginSettingsToMain();
         if (!supabaseClient && !initSupabaseClient()) {
           throw new Error('先に接続設定で Supabase anon public key を保存してください。');
         }
@@ -1133,14 +1275,15 @@
       return data;
     }
 
-    function saveSettings() {
+    function saveSettings(showAlert = true) {
       const ids = ['supabaseUrl', 'supabaseAnonKey', 'templatesUrl', 'checkSuppressionUrl', 'createBatchFromListUrl', 'sendTestUrl', 'sendBatchUrl'];
       const data = {};
       ids.forEach(id => data[id] = document.getElementById(id).value.trim());
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       initSupabaseClient();
       refreshAuthState();
-      alert('設定を保存しました。');
+      syncMainSettingsToLogin();
+      if (showAlert) alert('設定を保存しました。');
     }
 
     function loadSettings() {
@@ -1153,7 +1296,10 @@
       });
 
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return;
+      if (!saved) {
+        syncMainSettingsToLogin();
+        return;
+      }
       try {
         const data = JSON.parse(saved);
         Object.entries(data).forEach(([id, value]) => {
@@ -1161,6 +1307,7 @@
           if (el) el.value = value || DEFAULT_FUNCTION_URLS[id] || (id === 'supabaseUrl' ? DEFAULT_SUPABASE_URL : '');
         });
       } catch (_) {}
+      syncMainSettingsToLogin();
     }
 
     function clearSettings() {
